@@ -150,3 +150,12 @@ test("Linq webhook signature and payload parsing", () => {
   assert.deepEqual(parsed?.event, { chatId: "chat_1", isGroup: true, from: SAM, text: "hi all", messageId: "m1" });
   assert.equal(parseLinqWebhook({ event_type: "message.delivered", event_id: "x", data: {} }), null);
 });
+
+test("the tracked .env.example never contains real secrets", async () => {
+  const { readFileSync } = await import("node:fs");
+  const example = readFileSync(".env.example", "utf8");
+  assert.ok(!/sk-ant-|whsec_[A-Za-z0-9]{8,}/.test(example), ".env.example contains what looks like a real key");
+  for (const k of ["ANTHROPIC_API_KEY", "PROJECT_SECRET", "LINQ_API_TOKEN", "ADMIN_TOKEN"]) {
+    assert.match(example, new RegExp(`^${k}=\\s*$`, "m"), `${k} must be blank in .env.example (put real values in .env)`);
+  }
+});
