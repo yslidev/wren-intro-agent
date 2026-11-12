@@ -4,7 +4,7 @@ Wren texts candidates and founders the way a well-connected friend would. It sta
 
 The design copies Ditto, an AI matchmaker that runs over iMessage, and applies it to hiring. [`docs/teardown.md`](docs/teardown.md) has the teardown: what Ditto-style agents do in group chats, and how each behavior maps to code here.
 
-**Live demo, no install:** https://yslidev.github.io/wren-intro-agent/ (the full agent runs in your browser on synthetic data. Press **Play the Alex + Sam demo**.)
+**Live demo, no install:** https://yushan.li/wren-intro-agent/ (the full agent runs in your browser on synthetic data. Press **Play the Alex + Sam demo**.)
 
 ```
 Alex ─┐  vouch from Maya           ┌─ Sam (founder, Marigold)
