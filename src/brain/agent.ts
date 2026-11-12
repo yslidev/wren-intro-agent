@@ -4,6 +4,7 @@ import { TransportUnsupported, type Transport } from "../transports/types.js";
 import type { InboundEvent, Intro, Person } from "../types.js";
 import type { Brain } from "./llm.js";
 import { MIN_SCORE, rankFounders } from "./match.js";
+import { isOptOut } from "./text.js";
 
 /** The three questions a friend asks before vouching for you to someone they know. */
 const QUESTIONS = [
@@ -51,6 +52,16 @@ export class Agent {
 
   private async onDM(e: InboundEvent) {
     let p = this.store.byHandle(e.from);
+    if (isOptOut(e.text)) {
+      if (p) { p.optedOut = true; this.store.save(); }
+      this.store.addLog("decision", `${p?.first ?? e.from} opted out (${e.text.trim()}). Wren will not text them until they write again.`);
+      return;
+    }
+    if (p?.optedOut) {
+      p.optedOut = false;
+      this.store.save();
+      this.store.addLog("decision", `${p.first} texted again, opt-out cleared`);
+    }
     if (!p) {
       p = this.store.addPerson({
         id: `c_${randomUUID().slice(0, 8)}`, handle: e.from, name: "New contact", first: "there", role: "candidate",
@@ -317,6 +328,10 @@ export class Agent {
   }
 
   async dm(p: Person, ...texts: string[]) {
+    if (p.optedOut) {
+      this.store.addLog("decision", `skipped ${texts.length} text(s) to ${p.first}: opted out`);
+      return;
+    }
     for (const text of texts.filter(Boolean)) {
       const { chatId, messageId } = await this.t.sendDM(p.handle, text);
       this.store.ensureChat(chatId, { handles: [p.handle], isGroup: false });

@@ -47,20 +47,46 @@ With no `ANTHROPIC_API_KEY`, Wren runs on rules. With a key it uses `claude-opus
 
 ## Put it on real iMessage
 
-### Linq (cloud lines, real group chats)
-1. Get a Linq Partner API token and a line from Linq (Linq provisions them).
-2. Deploy the server (see below), then set `TRANSPORT=linq`, `LINQ_API_TOKEN` and `LINQ_FROM_NUMBER`.
-3. Subscribe a webhook. Linq returns the `signing_secret` only once; put it in `LINQ_WEBHOOK_SECRET`.
+### Linq + Render (cloud lines, real group chats)
 
-```bash
-curl -X POST https://api.linqapp.com/api/partner/v3/webhook-subscriptions \
-  -H "Authorization: Bearer $LINQ_API_TOKEN" -H "Content-Type: application/json" \
-  -d '{"target_url":"https://YOUR-HOST/webhooks/linq?version=2026-02-03","subscribed_events":["message.received"]}'
-```
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/yslidev/wren-intro-agent)
 
-4. Start a thread: `curl -X POST https://YOUR-HOST/api/kickoff/c_alex -H "x-admin-token: $ADMIN_TOKEN"`. Swap the seed handles for real numbers of people who agreed to be texted.
+1. **Deploy.** Click the button and sign in to Render with GitHub. The blueprint creates a free web service and generates an `ADMIN_TOKEN`. Leave the Linq fields empty for now; the service boots in simulator mode until they're set. Check it at `https://<your-service>.onrender.com/healthz`.
+2. **Get a Linq line.** Start the free 7-day sandbox at [linqapp.com/lp/try-linq](https://linqapp.com/lp/try-linq). Copy your API token from the dashboard, then find your line's number:
+   ```bash
+   LINQ_API_TOKEN=... node scripts/linq.mjs numbers
+   ```
+3. **Point Linq at Render.** This prints the webhook signing secret once:
+   ```bash
+   LINQ_API_TOKEN=... LINQ_FROM_NUMBER=+1... node scripts/linq.mjs subscribe https://<your-service>.onrender.com
+   ```
+4. **Switch to Linq.** In Render > Environment, set `LINQ_API_TOKEN`, `LINQ_FROM_NUMBER` and `LINQ_WEBHOOK_SECRET`, plus `ANTHROPIC_API_KEY` if you want Claude writing the texts. Render redeploys, and `/healthz` should then say `"transport":"linq"`.
+5. **Add real people who agreed to be texted** (yourself as the candidate, a founder friend as the other side), then have Wren text first:
+   ```bash
+   H=https://<your-service>.onrender.com; T=<ADMIN_TOKEN from Render>
+   curl -X POST $H/api/people -H "x-admin-token: $T" -H "content-type: application/json" -d '{
+     "role":"candidate","name":"Your Name","handle":"+1YOURNUMBER",
+     "vouch":{"name":"A friend","relation":"worked with you at X","quote":"someone who ships"},
+     "candidate":{"title":"PM","years":5,"skills":["payments","growth"]}}'
+   curl -X POST $H/api/people -H "x-admin-token: $T" -H "content-type: application/json" -d '{
+     "role":"founder","name":"Founder Friend","handle":"+1THEIRNUMBER",
+     "founder":{"company":"Acme","stage":"seed","sector":"fintech","roleTitle":"First PM","bandK":[170,200],"equity":"1%",
+       "setup":"remote","mustHaves":["payments","growth"],"problem":"activation is flat","slots":["Thu 10:00 AM PT","Fri 2:00 PM PT"]}}'
+   curl -X POST $H/api/kickoff/<candidate id from the first response> -H "x-admin-token: $T"
+   ```
+   Reply to Wren from your phone. Once you approve your blurb, it proposes the founder, texts them, and starts the group chat when you've both said yes.
 
-Linq rules this code already follows: no links in a new chat's first message; every intro group is named, so two intros between the same people stay separate threads; webhooks are verified with Standard Webhooks HMAC and deduplicated by `event_id`.
+How Linq's rules are handled:
+- **No links in a new chat's first message.** Wren's opener never contains one.
+- **Every intro group gets a name**, so two intros between the same people stay separate threads.
+- **Webhooks are verified** with Standard Webhooks HMAC and deduplicated by `event_id`.
+- **STOP and the other carrier keywords** silence Wren until the person texts again.
+- **With real numbers, every read and admin endpoint requires `ADMIN_TOKEN`.**
+
+Caveats:
+- **Render's free tier sleeps after 15 idle minutes,** so the first text after a quiet spell can take about a minute.
+- **State is lost on every restart and deploy,** because the disk is temporary. Add a Render disk at `/app/data/runtime`, or Postgres, before relying on it.
+- **Linq's sandbox may limit or simulate messaging.** Real outbound iMessage needs a live Linq plan.
 
 ### Photon (free, on your own Mac)
 ```bash
@@ -72,7 +98,7 @@ Give your terminal Full Disk Access first. The local kit can text people and pos
 ## Deploy
 
 - **GitHub Pages** (static demo): `.github/workflows/pages.yml` runs `npm run build:web` and publishes `site/` on every push to `main`.
-- **Render** (the webhook server): `render.yaml` is a one-click blueprint. Create a Render service from this repo and fill in the env vars.
+- **Render** (the webhook server): `render.yaml` is the one-click blueprint behind the button above.
 - **Anything with Docker**: `docker build -t wren . && docker run -p 8787:8787 --env-file .env wren`.
 
 The store is a JSON file (`data/runtime/state.json`). That's fine for one instance; move it to Postgres before running more than one.
@@ -88,7 +114,7 @@ The store is a JSON file (`data/runtime/state.json`). That's fine for one instan
 - **Declines stay private.** If the founder passes, the candidate hears "it's about their side, not you." Reasons are asked for one-on-one and never forwarded.
 
 ## Not built yet
-Founder-side onboarding over text, real calendar booking, a database, per-intro consent logging, opt-out keywords (STOP), and an admin UI for adding vouches.
+Founder-side onboarding over text, real calendar booking, a database, per-intro consent logging, and an admin UI for adding people and vouches.
 
 ## License
 MIT

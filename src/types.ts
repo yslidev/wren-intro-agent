@@ -46,6 +46,8 @@ export interface Person {
   asked: number;
   blurb?: string;
   hideComp?: boolean;
+  /** Texted STOP (or another carrier opt-out keyword). Wren sends nothing until they text again. */
+  optedOut?: boolean;
   notes: string[];
 }
 

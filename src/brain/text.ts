@@ -61,4 +61,7 @@ export function agreedSlot(text: string, offered: string[] = []): string | undef
   return undefined;
 }
 
+/** Carrier opt-out keywords, matched the way Linq does: the whole trimmed message, any case, space/hyphen optional. */
+export const isOptOut = (text: string) => /^(stop|unsubscribe|opt[\s-]?out|cancel|end|quit)$/i.test(text.trim().replace(/[.!]+$/, ""));
+
 export const isSmallTalkAck = (text: string) => /^(thanks|thank you|ty|tysm|lol|haha+|love it|amazing|yay|🙏|❤️|👍)[!. ]*$/i.test(text.trim());

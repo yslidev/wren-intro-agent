@@ -99,6 +99,33 @@ test("a founder pass is softened for the candidate and Wren keeps looking", asyn
   assert.match(lastFromWren(`dm:${priya.handle}`), /pass this time/);
 });
 
+test("STOP silences Wren until the person writes again", async () => {
+  const nina = store.person("c_nina")!;
+  await send(nina.handle, "STOP");
+  assert.equal(nina.optedOut, true);
+  const before = store.dmChatFor(nina.handle)?.messages.length ?? 0;
+  await agent.proposeNext(nina);
+  assert.equal(store.dmChatFor(nina.handle)?.messages.length ?? 0, before, "no texts after STOP");
+  await send(nina.handle, "hey, any updates?");
+  assert.equal(nina.optedOut, false);
+});
+
+test("POST /api/people adds a real person who can then be matched", async () => {
+  const res = await built.app.request("/api/people", {
+    method: "POST", headers: { "content-type": "application/json" },
+    body: JSON.stringify({
+      role: "founder", name: "Test Founder", handle: "(555) 010-0299",
+      founder: { company: "Testco", stage: "seed", sector: "fintech", roleTitle: "First PM", bandK: [170, 190], equity: "1%", setup: "remote",
+        mustHaves: ["payments"], problem: "no PM yet", slots: ["Fri 9:00 AM PT"] },
+    }),
+  });
+  assert.equal(res.status, 200);
+  const { id } = (await res.json()) as { id: string };
+  assert.equal(store.person(id)?.handle, "+15550100299");
+  const bad = await built.app.request("/api/people", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ role: "founder", name: "x", handle: "+15550100298" }) });
+  assert.equal(bad.status, 400, "founders need a founder profile");
+});
+
 test("matching respects pay floors and setup", () => {
   const c = { ...store.person("c_jordan")!, candidate: { ...store.person("c_jordan")!.candidate!, floorK: 190 } };
   const ranked = rankFounders(c, store.people, []);
