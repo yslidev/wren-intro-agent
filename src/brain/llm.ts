@@ -2,7 +2,8 @@ import Anthropic from "@anthropic-ai/sdk";
 import { betaZodOutputFormat } from "@anthropic-ai/sdk/helpers/beta/zod";
 import { z } from "zod";
 import type { Person } from "../types.js";
-import { agreedSlot, extractFloorK, extractSetups, extractSkills, extractStages, intent, isSmallTalkAck, mentionsAgent, type Intent } from "./text.js";
+import { renderReasons } from "./match.js";
+import { agreedSlot, extractFloorK, extractName, extractSetups, extractSkills, extractStages, extractVoucher, intent, isSmallTalkAck, mentionsAgent, readSide, statedName, type Intent } from "./text.js";
 import { say, VOICE_GUIDE } from "./voice.js";
 
 /**
@@ -137,6 +138,30 @@ export class Brain {
     return out?.intent ?? quick;
   }
 
+  /**
+   * Read a first-contact answer: a name, which side they're on, or who vouched for them. Claude when available
+   * (people type "lol it's yushan, hiring for my startup"), rules otherwise. Null means "ask again".
+   */
+  async readIntake(step: "name" | "side" | "voucher", text: string): Promise<{ name: string | null; side: "hiring" | "looking" | null; voucher: string | null }> {
+    const rules = () => {
+      const n = step === "name" ? extractName(text) : statedName(text);
+      const v = step === "voucher" ? extractVoucher(text) : undefined;
+      return { name: n?.name ?? null, side: readSide(text) ?? null, voucher: v ?? null };
+    };
+    const out = await this.ask(
+      "read_intake",
+      z.object({
+        name: z.string().nullable().describe("The person's own name if they stated it (e.g. 'I'm Yushan' -> 'Yushan'), properly capitalized; null for greetings like 'yo' or anything that isn't their name"),
+        side: z.enum(["hiring", "looking"]).nullable().describe("hiring = they want to hire someone; looking = they're open to a new role; null if unclear"),
+        voucher: z.string().nullable().describe("Only when step is 'voucher': the full name of the person who referred them, properly capitalized; 'nobody' if no one did; null if the answer isn't a name"),
+      }),
+      "You're reading one text from someone Wren is onboarding. Extract only what is clearly stated. Never invent a name.",
+      JSON.stringify({ step, wrenJustAsked: { name: "What should I call you?", side: "Are you hiring, or open to something new?", voucher: "Who sent you my way?" }[step], text }),
+      "low",
+    );
+    return out ?? rules();
+  }
+
   // ---------- the match ----------
   async pitch(c: Person, f: Person, reasons: string[]): Promise<Pitch> {
     const fp = f.founder!;
@@ -148,11 +173,11 @@ export class Brain {
         groupIntro: z.array(z.string()).describe("5 texts for the new group chat, no links: (1) exactly 'setting up your chat...'; (2) an invitation card: '<Candidate> x <Founder>, it's official 🎉' then lines starting 🗓 when (they pick here), 📍 where (25-min video call), 💸 already settled (band, equity, setup); (3) one warm line on who the hiring person is, with their vouch; (4) one warm line on the candidate's proof of work and vouch; (5) 'what day works best?' with the hiring side's open times, then say you'll step out."),
       }),
       "Write the texts for a double opt-in intro. Ground every claim in the context. Reasons are why this match is good; use the strongest one or two in plain language. Share the founder's band only in the group intro; never share the candidate's salary floor if hideComp is true.",
-      JSON.stringify({ candidate: { name: c.name, blurb: c.blurb, vouch: c.vouch, hideComp: c.hideComp, ...c.candidate }, founder: { name: f.name, vouch: f.vouch, ...fp }, reasons }),
+      JSON.stringify({ candidate: { name: c.name, blurb: c.blurb, vouch: c.vouch, hideComp: c.hideComp, ...c.candidate }, founder: { name: f.name, vouch: f.vouch, ...fp }, reasons: renderReasons(reasons, c.first) }),
       "medium",
     );
     if (out && out.toCandidate.length && out.toFounder.length && out.groupIntro.length) return out;
-    const why = reasons.slice(0, 2).join("; ");
+    const why = renderReasons(reasons, "you", 2);
     const stage = titleStage(fp.stage);
     const key = `${c.id}:${f.id}`;
     const recruiter = f.persona && f.persona.kind !== "founder" ? ` ${f.first} is running the search (${f.persona.title}).` : "";

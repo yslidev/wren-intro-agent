@@ -28,26 +28,34 @@ export const say = {
   // ---------------- first contact
   helloVouched: (key: string, v: { first: string; voucher: string; quote: string }) =>
     fill(pick([
-      "Hi {first}, it's Wren 🐦 {voucher} gave me your number and said you're {quote}. That's the kind of sentence I collect.",
+      "Hi {first}, it's Wren 🐦. {voucher} gave me your number and said you're {quote}. That's the kind of sentence I collect.",
       "Hi {first}! Wren here. {voucher} passed along your number with a review I'd frame: {quote}.",
       "Hey {first}, it's Wren from Pathline. {voucher} says you're {quote}, which is exactly why I'm texting.",
     ], key), v),
 
   whoAmI: (key: string) => pick([
-    "Quick intro on me: I'm an AI matchmaker for jobs. Think friend-who-knows-every-founder, minus the awkward coffee. I only make an intro when both sides say yes.",
+    "Quick intro on me: I'm an AI matchmaker for jobs. Think of a friend who knows every founder, minus the awkward coffee. I only make an intro when both sides say yes.",
     "I'm an AI agent that makes warm job intros. Few, thoughtful, always double opt-in. No job board, no application portal, no black hole.",
     "I'm an AI matchmaker for careers. I don't spam you with listings; I find one person worth meeting and ask you both first.",
   ], key),
 
   helloStranger: (key: string) => pick([
-    "Hi! I'm Wren 🐦 an AI matchmaker that makes job intros through people's friends. What should I call you?",
+    "Hi! I'm Wren 🐦, an AI matchmaker who makes job intros through people's friends. What should I call you?",
     "Hey, Wren here. I'm an AI agent that introduces people to founders who'd actually want to meet them. First things first: what's your name?",
   ], key),
 
   askVoucher: (key: string, first: string) => fill(pick([
-    "Nice to meet you, {first}. I work off vouches, like a friend would. Who sent you my way?",
-    "Great to meet you, {first}. Every intro I make starts with someone who's seen your work. Who pointed you to me?",
+    "Love that, {first}. I work off vouches, the way a friend would. Who sent you my way?",
+    "Great. Every intro I make starts with someone who's seen your work. Who pointed you to me?",
   ], key), { first }),
+
+  askNameAgain: (key: string) => pick([
+    "Hi! What should I call you?",
+    "Hey! Before anything else, what's your name?",
+  ], key),
+  askSideAgain: "Got it. Just so I point you the right way: are you hiring for a role, or looking for your next one?",
+  askVoucherAgain: "Who's someone who's seen your work and sent you my way? Just their name is perfect. If nobody did, say \"nobody\" and that's fine too.",
+  noVoucher: "Totally fine. You'll just get a few more questions from me, since nobody's vouched yet.",
 
   thanksVoucher: (key: string, v: { first: string; voucher: string }) => fill(pick([
     "Love that. I'll say hi to {voucher} too.",
@@ -71,7 +79,7 @@ export const say = {
 
   // ---------------- hiring-side intake
   askCompany: (key: string, first: string) => fill(pick([
-    "Love it, {first}. I find people the way a well-connected friend would, and only intro them when both sides say yes. What's the company called?",
+    "Love it, {first}. I find people the way a well-connected friend would, and I only make an intro when both sides say yes. What's the company called?",
     "Amazing. I'm basically a recruiter who only does warm intros. What's the company?",
   ], key), { first }),
   askJD: (key: string, company: string) => fill(pick([
@@ -142,7 +150,7 @@ export const say = {
   ], key), { f: first }),
 
   founderPitchOpener: (key: string, v: { first: string; role: string }) => fill(pick([
-    "Hi {first}, it's Wren 🐦 I think you should meet someone for your {role} role.",
+    "Hi {first}, it's Wren 🐦. I think you should meet someone for your {role} role.",
     "Hi {first}! Wren here with someone for your {role} search.",
   ], key), v),
   founderAsk: (key: string, candFirst: string) => fill(pick([

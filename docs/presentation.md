@@ -69,6 +69,8 @@ A running list for the work-trial presentation. Newest changes at the top of eac
 
 ## Changes we made (and why)
 
+- **Wren reads intake answers properly (from live testing).** Greetings ("Yo") are no longer taken as names, a late "my name is…" updates the name, a sentence like "I’m open to sth new" is no longer taken as the voucher, and "nobody" is an accepted answer. With an API key, Claude reads these answers; without one, stricter rules do. Match reasons now say "you" when Wren talks to the candidate.
+- **Grammar pass on Wren's lines.** Fixed "Hi! I'm Wren 🐦 an AI matchmaker" (missing comma), the doubled "Nice to meet you", and similar run-ons.
 - **Smart punctuation from iPhones is understood (live bug).** The first real test on the live line read "I’m Yushan" as the name "I’m", because iPhones send curly apostrophes. Every incoming text is now normalized to plain punctuation, and a test covers it.
 - **The candidate's name is hidden until they say yes (privacy fix).** When the hiring side went first, Wren was sending the candidate's name before the candidate agreed. The hiring side now sees the work, and gets the name only after the yes.
 - **The group intro is redesigned around the moment of connection.** It moved from three plain lines to the Ditto ritual combined with the shape of a real friend intro.

@@ -140,3 +140,23 @@ test("iPhone smart punctuation is understood (I’m, don’t)", async () => {
   await t("I’m Yushan");
   assert.equal(store.byHandle(P)!.first, "Yushan");
 });
+
+test("first contact replays the live transcript: greetings aren't names, late corrections work", async () => {
+  const P = "+13415550144";
+  const t = (text: string) => agent.handle({ chatId: `real:${P}`, isGroup: false, from: P, text, messageId: crypto.randomUUID() });
+  const last = () => net.sent.filter((s) => s.to === P).at(-1)?.text ?? "";
+  await t("Yo");
+  await t("Yo");
+  assert.match(last(), /call you|your name/i, "a greeting is not a name");
+  await t("I’m Yushan");
+  assert.match(last(), /Yushan.*hiring/);
+  await t("My name is Yushan");
+  assert.equal(store.byHandle(P)!.first, "Yushan");
+  await t("I’m open to sth new!");
+  assert.match(last(), /Who (sent|pointed)/);
+  await t("I’m open to sth new!");
+  assert.match(last(), /Just their name/, "a sentence is not a voucher");
+  await t("Aiden Bai");
+  assert.equal(store.byHandle(P)!.vouch!.name, "Aiden Bai");
+  assert.match(last(), /resume/i);
+});

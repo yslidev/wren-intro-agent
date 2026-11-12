@@ -1,6 +1,25 @@
 import type { Intro, Person } from "../types.js";
 
+/**
+ * `reasons` are templates, so the same reason can be said to the candidate ("you have done exactly that")
+ * or about them ("Alex has done exactly that"). Render with `renderReasons`.
+ */
 export interface MatchResult { founder: Person; score: number; reasons: string[] }
+
+/** "payments, onboarding and growth" */
+export const joinList = (xs: string[]) => (xs.length < 2 ? xs.join("") : `${xs.slice(0, -1).join(", ")} and ${xs.at(-1)}`);
+
+/** Render reason templates for "you" (talking to the candidate) or a name/label (talking about them). */
+export function renderReasons(reasons: string[], who: string, max = reasons.length): string {
+  const you = who === "you";
+  const parts = reasons.slice(0, max).map((r) => r
+    .replace(/\{Cs\}/g, you ? "your" : `${who}'s`)
+    .replace(/\{C\}/g, who)
+    .replace(/\{has\}/g, you ? "have" : "has")
+    .replace(/\{wants\}/g, you ? "want" : "wants"));
+  const s = parts.length > 1 ? `${parts.slice(0, -1).join("; ")}; and ${parts.at(-1)}` : parts[0] ?? "";
+  return s.charAt(0).toUpperCase() + s.slice(1);
+}
 
 /** The bar a friend uses: only make the intro if it's clearly good. */
 export const MIN_SCORE = 4;
@@ -53,24 +72,24 @@ export function rankFounders(c: Person, people: Person[], intros: Intro[]): Matc
     const overlap = fp.mustHaves.filter((m) => cp.skills.includes(m));
     if (overlap.length < MIN_OVERLAP) continue;
     score += overlap.length * 2;
-    reasons.push(`${f.first} needs ${overlap.join(", ")}, which ${c.first} has done`);
+    reasons.push(`${f.first} needs ${joinList(overlap)}, and {C} {has} done exactly that`);
     if (cp.floorK !== undefined) {
       if (fp.bandK[1] < cp.floorK) continue;
       if (fp.bandK[0] >= cp.floorK) {
         score += 2;
-        reasons.push(`pays $${fp.bandK[0]}-${fp.bandK[1]}K, at or above ${c.first}'s $${cp.floorK}K floor`);
+        reasons.push(`the band ($${fp.bandK[0]}-${fp.bandK[1]}K) clears {Cs} $${cp.floorK}K floor`);
       } else {
         score += 1;
-        reasons.push(`band $${fp.bandK[0]}-${fp.bandK[1]}K overlaps ${c.first}'s $${cp.floorK}K floor`);
+        reasons.push(`the band ($${fp.bandK[0]}-${fp.bandK[1]}K) reaches {Cs} $${cp.floorK}K floor`);
       }
     }
     if (cp.setups?.length) {
       if (!cp.setups.includes(fp.setup)) continue;
-      reasons.push(`${fp.setup}, which ${c.first} wants`);
+      reasons.push(`it's ${fp.setup}, which {C} {wants}`);
     }
     if (cp.stages?.length && cp.stages.includes(fp.stage)) {
       score += 1;
-      reasons.push(`${fp.stage}, in ${c.first}'s stage range`);
+      reasons.push(`${fp.stage} is in {Cs} range`);
     }
     out.push({ founder: f, score, reasons });
   }

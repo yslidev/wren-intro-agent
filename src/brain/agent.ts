@@ -4,7 +4,7 @@ import { TransportUnsupported, type Transport } from "../transports/types.js";
 import type { FounderProfile, InboundEvent, Intro, Person } from "../types.js";
 import { CANDIDATE_QUESTIONS, parseJD, parseResume, ROLE_QUESTIONS, soundsLikeHiring, soundsLikeSkip } from "./intake.js";
 import type { Brain } from "./llm.js";
-import { MIN_SCORE, rankCandidates, rankFounders } from "./match.js";
+import { MIN_SCORE, rankCandidates, rankFounders, renderReasons } from "./match.js";
 import { personaGroupHello, personaMove } from "./personas.js";
 import { extractFloorK, extractName, extractSetups, extractSkills, isOptOut } from "./text.js";
 import { say } from "./voice.js";
@@ -98,13 +98,7 @@ export class Agent {
       case "role_review": return this.onRoleReview(p, e.text);
       // ---- candidate side
       case "new":
-        if (!p.vouch) {
-          p.vouch = { name: e.text.trim().slice(0, 60), relation: "said they referred them (not yet confirmed)", quote: "" };
-          p.stage = "resume";
-          this.store.save();
-          await this.dm(p, say.thanksVoucher(p.id, { first: p.first, voucher: p.vouch.name }), say.resumeAsk(p.id));
-          return;
-        }
+        if (!p.vouch) return this.onVoucher(p, e.text);
         return this.startInterview(p);
       case "resume": return this.onResume(p, e.text);
       case "interviewing": return this.onInterviewAnswer(p, e.text);
@@ -123,22 +117,43 @@ export class Agent {
   }
 
   private async onName(p: Person, text: string) {
-    const n = extractName(text);
-    if (!n) return this.dm(p, "Sorry, I didn't catch that. What should I call you?");
-    p.first = n.first;
-    p.name = n.name;
-    // Someone who opens with "I'm hiring" skips the question.
-    if (soundsLikeHiring(text)) return this.becomeHiring(p);
+    const r = await this.brain.readIntake("name", text);
+    if (!r.name) return this.dm(p, say.askNameAgain(`${p.id}:${text.length}`));
+    p.name = r.name;
+    p.first = r.name.split(/\s+/)[0];
+    // Someone who opens with "I'm Yushan, hiring for my startup" skips the next question.
+    if (r.side === "hiring") return this.becomeHiring(p);
+    if (r.side === "looking") return this.toVoucherStep(p);
     p.stage = "side";
     this.store.save();
     await this.dm(p, say.askSide(p.id, p.first));
   }
 
   private async onSide(p: Person, text: string) {
-    if (soundsLikeHiring(text)) return this.becomeHiring(p);
+    const r = await this.brain.readIntake("side", text);
+    // "My name is Yushan" arriving late: fix the name, then ask again.
+    if (r.name && r.name !== p.name) { p.name = r.name; p.first = r.name.split(/\s+/)[0]; this.store.save(); }
+    if (r.side === "hiring") return this.becomeHiring(p);
+    if (r.side === "looking") return this.toVoucherStep(p);
+    return this.dm(p, r.name ? say.askSide(`${p.id}:again`, p.first) : say.askSideAgain);
+  }
+
+  private async toVoucherStep(p: Person) {
     p.stage = "new";
     this.store.save();
     await this.dm(p, say.askVoucher(p.id, p.first));
+  }
+
+  private async onVoucher(p: Person, text: string) {
+    const r = await this.brain.readIntake("voucher", text);
+    if (!r.voucher) return this.dm(p, say.askVoucherAgain);
+    const nobody = r.voucher.toLowerCase() === "nobody";
+    p.vouch = nobody
+      ? { name: "no one yet", relation: "found Wren directly", quote: "" }
+      : { name: r.voucher, relation: "said they referred them (not yet confirmed)", quote: "" };
+    p.stage = "resume";
+    this.store.save();
+    await this.dm(p, nobody ? say.noVoucher : say.thanksVoucher(p.id, { first: p.first, voucher: r.voucher }), say.resumeAsk(p.id));
   }
 
   // ------------------------------------------------------------------ hiring-side intake
@@ -224,12 +239,12 @@ export class Agent {
     const pitch = await this.brain.pitch(c, f, top.reasons);
     const intro: Intro = {
       id: `i_${randomUUID().slice(0, 8)}`, candidateId: c.id, founderId: f.id, status: "asked_founder", initiatedBy: "founder",
-      reasons: top.reasons, score: top.score, pitch, feedback: {}, createdAt: new Date().toISOString(),
+      reasons: top.reasons.map((r) => renderReasons([r], c.first)), score: top.score, pitch, feedback: {}, createdAt: new Date().toISOString(),
     };
     this.store.addIntro(intro);
     // Candidates stay anonymous until they say yes: the hiring side sees the work, not the name.
     const anon = (s: string) => s.split(c.name).join("This person").split(c.first).join("they");
-    await this.dm(f, say.foundCandidate(f.id), anon(c.blurb ?? c.candidate?.title ?? "Someone I know well."), anon(`Why I think so: ${top.reasons.slice(0, 2).join("; ")}.`), say.askReachOut);
+    await this.dm(f, say.foundCandidate(f.id), anon(c.blurb ?? c.candidate?.title ?? "Someone I know well."), `Why I think so: ${renderReasons(top.reasons, "this person", 2)}.`, say.askReachOut);
   }
 
   // ------------------------------------------------------------------ candidate intake
@@ -240,7 +255,7 @@ export class Agent {
     if (p.role === "candidate" && p.stage === "new") return this.startInterview(p);
     if (p.role === "candidate" && p.stage === "ready") return this.proposeNext(p);
     if (p.role === "founder" && p.stage === "ready" && p.founder?.roleTitle) return this.proposeCandidateTo(p);
-    await this.dm(p, `Hi ${p.first}, it's Wren 🐦 I'll text you when I have someone worth your time.`);
+    await this.dm(p, `Hi ${p.first}, it's Wren 🐦. I'll text you when I have someone worth your time.`);
   }
 
   private async onResume(p: Person, text: string) {
@@ -325,7 +340,7 @@ export class Agent {
     const pitch = await this.brain.pitch(c, top.founder, top.reasons);
     const intro: Intro = {
       id: `i_${randomUUID().slice(0, 8)}`, candidateId: c.id, founderId: top.founder.id, status: "asked_candidate", initiatedBy: "candidate",
-      reasons: top.reasons, score: top.score, pitch, feedback: {}, createdAt: new Date().toISOString(),
+      reasons: top.reasons.map((r) => renderReasons([r], c.first)), score: top.score, pitch, feedback: {}, createdAt: new Date().toISOString(),
     };
     this.store.addIntro(intro);
     await this.dm(c, ...pitch.toCandidate);

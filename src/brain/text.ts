@@ -110,14 +110,52 @@ export function extractSkills(text: string): string[] {
 }
 
 /** "I'm Yushan", "it's Yushan Li", "yushan" -> { first: "Yushan", name: "Yushan Li" } */
+const NOT_NAMES = /^(yo|hi|hey|hello|hiya|sup|ok|okay|yes|yeah|no|nope|lol|haha|hmm|thanks|ty|open|hiring|looking|sure|cool|nice|good|great|what|who|why|how|the|a|an|i|im|its|just|so|well|um|uh|test|ping|hello photon)$/i;
+const NOT_NAME_WORDS = /\b(open|hiring|looking|job|role|new|sth|something|interested|recruit\w*|help|intros?|friend|said)\b/i;
+
+/** Explicitly stated names ("my name is Yushan", "I'm Yushan", "call me Yu") — safe to act on mid-conversation. */
+export function statedName(text: string): { first: string; name: string } | undefined {
+  const t = text.trim().replace(/[.!?]+$/, "");
+  const lead = String.raw`(?:my name is|my name's|call me|this is|i am|i'?m|it'?s)\s+`;
+  // "it's yushan li" (two words, then the end) or "I'm Morgan, hiring for..." (one word, then a break).
+  const m = t.match(new RegExp(lead + String.raw`([a-z][\w'-]*)\s+([a-z][\w'-]*)$`, "i"))
+    ?? t.match(new RegExp(lead + String.raw`([a-z][\w'-]*)(?=\s*(?:[,;:—-]|$)|\s+(?:and|here|from|at|but|hiring|looking)\b)`, "i"));
+  if (!m) return undefined;
+  const words = [m[1], m[2]].filter((w): w is string => Boolean(w));
+  if (NOT_NAMES.test(words[0]) || words.some((w) => NOT_NAME_WORDS.test(w))) return undefined;
+  const cap = (w: string) => w.charAt(0).toUpperCase() + w.slice(1);
+  const parts = words.filter((w) => !NOT_NAMES.test(w)).map(cap);
+  return { first: parts[0], name: parts.join(" ") };
+}
+
 export function extractName(text: string): { first: string; name: string } | undefined {
+  const stated = statedName(text);
+  if (stated) return stated;
   const t = text.trim().replace(/[.!?,]+$/, "");
-  const m = t.match(/(?:i'?m|i am|it'?s|this is|my name is|call me|name'?s)\s+([a-z][\w'-]*)(?:\s+([a-z][\w'-]*))?/i);
-  const words = m ? [m[1], m[2]].filter(Boolean) as string[] : t.split(/\s+/).slice(0, 2);
-  if (!words.length || words[0].length > 20 || !/^[a-z]/i.test(words[0])) return undefined;
+  // A bare reply to "what should I call you?" is a name only if it looks like one: 1-3 words, no filler.
+  if (/\b(i'?m|my|it'?s|this is)\b/i.test(t) || NOT_NAME_WORDS.test(t) || t.split(/\s+/).length > 3) return undefined;
+  const words = t.split(/\s+/).slice(0, 2);
+  if (!words.length || words[0].length > 20 || !/^[a-z]/i.test(words[0]) || NOT_NAMES.test(words[0])) return undefined;
   const cap = (w: string) => w.charAt(0).toUpperCase() + w.slice(1);
   const parts = words.map(cap);
   return { first: parts[0], name: parts.join(" ") };
+}
+
+/** "Maya Chen sent me", "my friend Aiden", "it was Aiden Bai" -> "Aiden Bai". Undefined if it isn't a person's name. */
+export function extractVoucher(text: string): string | "nobody" | undefined {
+  const t = text.trim().replace(/[.!?]+$/, "");
+  if (/^(nobody|no one|noone|none|myself|i found you|found you (online|on)|google|twitter|x|linkedin)\b/i.test(t)) return "nobody";
+  const m = t.match(/^(?:(?:my\s+)?(?:friend|coworker|colleague|manager|old boss|boss|cofounder)\s+)?(?:it was\s+|from\s+)?([A-Z][\w'-]+(?:\s+[A-Z][\w'-]+){0,2})(?:\s+(?:sent|told|referred|pointed|mentioned|said)\b.*)?$/);
+  const name = m?.[1] ?? (/^[a-z][\w'-]+(\s+[a-z][\w'-]+)?$/i.test(t) ? t : undefined);
+  if (!name || NOT_NAMES.test(name) || NOT_NAME_WORDS.test(name) || /\b(i'?m|my|you|me)\b/i.test(name)) return undefined;
+  return name.split(/\s+/).map((w) => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+}
+
+/** Hiring, looking, or can't tell. */
+export function readSide(text: string): "hiring" | "looking" | undefined {
+  if (/\b(hiring|recruit\w*|we need|open role|headcount|jd|job description|on behalf of|for my (startup|team|company))\b/i.test(text)) return "hiring";
+  if (/\b(open|looking|exploring|job ?hunting|new (role|job|thing|opportunit\w*)|sth new|something new|next (role|thing|job)|candidate)\b/i.test(text)) return "looking";
+  return undefined;
 }
 
 /** Carrier opt-out keywords, matched the way Linq does: the whole trimmed message, any case, space/hyphen optional. */
