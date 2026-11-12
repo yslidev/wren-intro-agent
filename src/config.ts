@@ -11,7 +11,12 @@ if (existsSync(".env")) {
 const env = (k: string, d = "") => process.env[k]?.trim() || d;
 
 export const config = {
-  transport: env("TRANSPORT", "sim") as "sim" | "linq" | "photon",
+  transport: env("TRANSPORT", "sim") as "sim" | "linq" | "photon" | "spectrum",
+  spectrum: {
+    projectId: env("PROJECT_ID"),
+    projectSecret: env("PROJECT_SECRET"),
+    agentNumber: env("SPECTRUM_AGENT_NUMBER"),
+  },
   port: Number(env("PORT", "8787")),
   adminToken: env("ADMIN_TOKEN"),
   model: env("WREN_MODEL", "claude-opus-5-5"),

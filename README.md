@@ -88,7 +88,20 @@ Caveats:
 - **State is lost on every restart and deploy,** because the disk is temporary. Add a Render disk at `/app/data/runtime`, or Postgres, before relying on it.
 - **Linq's sandbox may limit or simulate messaging.** Real outbound iMessage needs a live Linq plan.
 
-### Photon (free, on your own Mac)
+### Photon Spectrum (managed cloud iMessage, free to start)
+```bash
+npm i -g @photon-ai/cli@legacy && photon login
+photon projects create --name wren --platforms imessage --json
+photon spectrum users add --project <id> --phone +1YOURNUMBER --email you@example.com --first-name You --json
+# .env: TRANSPORT=spectrum, PROJECT_ID, PROJECT_SECRET (photon projects secret <id>),
+#       SPECTRUM_AGENT_NUMBER = assignedPhoneNumber from `photon spectrum users list --json`
+npm start
+```
+Text `Hello Photon` to the assigned number from your registered phone to check the connection. Any other text starts Wren's normal flow.
+- **Free and Pro:** only registered users can text the agent, and it texts from a shared number. Group chats can't be created, so Wren sends a relay intro instead.
+- **Business:** a dedicated line, which can create real group intros.
+
+### Photon imessage-kit (free, on your own Mac)
 ```bash
 npm i @photon-ai/imessage-kit better-sqlite3
 TRANSPORT=photon npm start

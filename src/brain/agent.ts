@@ -47,6 +47,12 @@ export class Agent {
     const who = s.byHandle(e.from);
     s.addLog("inbound", `${who?.first ?? e.from} ${e.isGroup ? `in ${chat.displayName ?? "group"}` : "(DM)"}: ${e.text}`);
     if (e.isGroup) return this.onGroup(e);
+    // Connectivity check: "Hello Photon" (or "ping") echoes back without touching the intro flow.
+    if (/^(hello photon|ping)[.!]*$/i.test(e.text.trim())) {
+      const via = this.t.name === "spectrum" ? "Photon Spectrum" : this.t.name;
+      await this.say(chat.id, `${via} is connected. You said: ${e.text}`);
+      return;
+    }
     return this.onDM(e);
   }
 

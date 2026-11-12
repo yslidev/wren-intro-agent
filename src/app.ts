@@ -27,6 +27,7 @@ const NewPerson = z.object({
 import { LinqTransport, parseLinqWebhook, verifyLinqSignature } from "./transports/linq.js";
 import { PhotonTransport } from "./transports/photon.js";
 import { SimTransport } from "./transports/sim.js";
+import { SpectrumTransport } from "./transports/spectrum.js";
 import type { Transport } from "./transports/types.js";
 
 export interface Built { app: Hono; agent: Agent; store: Store; transport: Transport; brain: Brain }
@@ -37,6 +38,9 @@ export function makeTransport(): Transport {
     console.warn("TRANSPORT=linq but LINQ_API_TOKEN / LINQ_FROM_NUMBER are missing. Running the simulator until they're set.");
   }
   if (config.transport === "photon") return new PhotonTransport(process.env.PHOTON_HANDLE ?? "me");
+  if (config.transport === "spectrum") {
+    return new SpectrumTransport({ ...config.spectrum, log: (m) => console.log(`[spectrum] ${m}`) });
+  }
   return new SimTransport(config.simAgentHandle);
 }
 
