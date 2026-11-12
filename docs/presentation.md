@@ -69,6 +69,7 @@ A running list for the work-trial presentation. Newest changes at the top of eac
 
 ## Changes we made (and why)
 
+- **Presentation deck + leaner web app.** Added an HTML deck at /presentation with a detailed architecture diagram and one-line feature lists, and removed secondary labels and long descriptions from the demo.
 - **Wren adapts awkward questions (found testing Haiku live).** Asked "what would make you leave where you are now?" right after someone said they were laid off. Claude now keeps each question's meaning but rewords it to fit the person (e.g. "what would make a next role feel right?"), and acknowledges the feeling first.
 - **Switched to a smaller, faster model with emotional intelligence.** Moved from Opus 5.5 to Haiku 5.5 for speed and cost. Added an EQ section to Wren's prompt (read the feeling first, name it once, match the person's pace, deliver a no with care). Rules mode also acknowledges layoffs, stress, busy weeks and excitement before moving on.
 - **`.env` has a place for the Claude key** (`ANTHROPIC_API_KEY=`), which was missing.

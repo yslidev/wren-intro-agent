@@ -192,8 +192,7 @@ main { display: grid; grid-template-columns: 290px minmax(0, 1fr) 330px; gap: 16
 <body>
 <div class="wrap">
   <nav class="nav" aria-label="Sections">
-    <a href="#top" class="on">Live demo</a><a href="#how">How it works</a><a href="#decisions">Decisions</a>
-    <span class="sp"></span><span class="badge">Proof of concept · fictional data</span>
+    <a href="#top" class="on">Live demo</a><a href="#how">How it works</a><a href="#decisions">Decisions</a><a href="presentation/">Presentation</a>
   </nav>
   <header class="brand" id="top">
     <svg viewBox="0 0 64 64" aria-hidden="true">
@@ -209,11 +208,8 @@ main { display: grid; grid-template-columns: 290px minmax(0, 1fr) 330px; gap: 16
     </svg>
     <div class="copy">
       <h1><span>Wren</span>, your matchmaker for jobs</h1>
-      <p>Warm intros over iMessage. Vetted like a friend would, double opt-in, then a group chat.</p>
     </div>
     <div class="actions">
-      <span class="pill" id="transport"><span class="dot"></span><span></span></span>
-      <span class="pill" id="llm"><span class="dot"></span><span></span></span>
       <button class="btn play" id="demo" type="button" title="Alex gets interviewed, matched with a founder and introduced">▶ Candidate demo</button>
       <button class="btn" id="demo2" type="button" title="A stranger texts Wren cold and gets matched with a fictional recruiter who answers in her own voice">🎭 Recruiter demo</button>
       <button class="btn" id="demo3" type="button" title="A hiring manager sends a JD; Wren interviews them, finds a candidate and asks them privately">🏢 Hiring demo</button>
@@ -222,16 +218,15 @@ main { display: grid; grid-template-columns: 290px minmax(0, 1fr) 330px; gap: 16
   </header>
 
   <section class="track" aria-label="Intro progress">
-    <div class="track-head"><b id="track-title">Alex's intro</b><span id="track-sub">Press play, or text as anyone below.</span></div>
+    <div class="track-head"><b id="track-title">Alex's intro</b><span id="track-sub">Press play</span></div>
     <div class="steps" id="steps"></div>
   </section>
 
   <main>
     <section class="card" aria-label="Cast">
       <h2>🎭 The cast</h2>
-      <div class="sub" id="cast-sub"></div>
       <div class="filters" id="filters"></div>
-      <input class="search" id="search" type="search" placeholder="Search people, companies, voices" aria-label="Search the cast">
+      <input class="search" id="search" type="search" placeholder="Search" aria-label="Search the cast">
       <div class="cast" id="cast"></div>
     </section>
 
@@ -239,40 +234,37 @@ main { display: grid; grid-template-columns: 290px minmax(0, 1fr) 330px; gap: 16
 
     <section class="card" aria-label="What Wren is thinking">
       <h2>🧠 Inside Wren's head</h2>
-      <div class="sub">Matches, gate calls and persona replies, newest first.</div>
-      <label class="toggle"><input type="checkbox" id="show-msgs"> Show every message too</label>
+      <label class="toggle"><input type="checkbox" id="show-msgs"> Show messages</label>
       <div class="thoughts" id="thoughts"></div>
     </section>
   </main>
 
   <section class="sect" id="how" aria-labelledby="how-h">
     <h2 id="how-h">How it works</h2>
-    <p class="lede">Wren works like a great boutique recruiter who happens to live in your texts. It reads what's written down, interviews like an anthropologist, and only makes an intro when both sides say yes.</p>
     <div class="how">
-      <div class="how-card"><span class="num">1</span><b>Intake, both sides</b><p>Candidates paste a resume; hiring managers paste a JD. Then Wren asks for stories, not adjectives: the work you're proudest of, what drains you, what failed in this role before, the honest catch.</p></div>
-      <div class="how-card"><span class="num">2</span><b>One match, with reasons</b><p>Hard filters first (role family, pay floor, setup), then real skill overlap. Every point comes with a sentence, and those sentences become "why you two". One person at a time, never a stack.</p></div>
-      <div class="how-card"><span class="num">3</span><b>Double opt-in, privately</b><p>Either side can start. Wren asks the other side one-on-one, and nobody's name or details travel until they say yes. Declines stay private; Wren asks why so the next one is better.</p></div>
-      <div class="how-card"><span class="num">4</span><b>A group chat, then Wren steps out</b><p>"setting up your chat..." → an "it's official 🎉" card with pay already settled → one warm line about each person → "what day works best?" Wren stays quiet while they talk, locks the time, follows up after.</p></div>
+      <div class="how-card"><span class="num">1</span><b>Intake</b><p>Resume or JD, then stories</p></div>
+      <div class="how-card"><span class="num">2</span><b>Match</b><p>One person, with reasons</p></div>
+      <div class="how-card"><span class="num">3</span><b>Double opt-in</b><p>Asked privately</p></div>
+      <div class="how-card"><span class="num">4</span><b>Group chat</b><p>Intro, time, Wren steps out</p></div>
     </div>
   </section>
 
   <section class="sect" id="decisions" aria-labelledby="dec-h">
     <h2 id="dec-h">Decisions</h2>
-    <p class="lede">The calls behind this proof of concept, and what we chose not to build.</p>
     <div class="moment">
-      <div class="side bad"><span class="k">On LinkedIn</span><b>A cold InMail from a stranger</b><p>The candidate is one of hundreds of applicants, or a recruiter's 40th message that day. The first conversation is a screen. Pay comes up last. Nobody vouched for anyone.</p></div>
-      <div class="side good"><span class="k">With Wren</span><b>A group text from a friend who vetted you both</b><p>Both people already said yes. Each arrives with a vouch and one line of real work. Pay and setup are settled in the first message, so the first call is about the work. It feels like a friend's intro because it's built the same way.</p></div>
+      <div class="side bad"><span class="k">On LinkedIn</span><b>A cold InMail from a stranger</b></div>
+      <div class="side good"><span class="k">With Wren</span><b>A group text from a friend who vetted you both</b></div>
     </div>
     <div class="dec">
-      <div class="dec-card"><span class="q">Who's the wedge?</span><p><b>Niche, expensive-to-fill roles at seed to Series B companies:</b> founding engineers, first PMs, ML and evals, AI safety, specialist GTM. These are the hires agencies charge 20–25% for, and founders already make them through friends. Big-company, high-volume pipelines are a different product.</p></div>
-      <div class="dec-card"><span class="q">What replaces the resume?</span><p><b>A vouch plus a short intake conversation, distilled into a blurb the candidate approves.</b> The resume is still read, as input that saves questions, not as the signal. On the other side, the JD is input and the approved role card (90-day success, what failed before, honest pitch and catch) is the signal.</p></div>
-      <div class="dec-card"><span class="q">Who initiates?</span><p><b>Wren does, and either side can start it.</b> A candidate texts in, or a hiring manager sends a JD. Wren proposes one match at a time and asks each side privately. Mutual interest is required before anyone is introduced.</p></div>
-      <div class="dec-card"><span class="q">Transparency?</span><p><b>Pay band and setup up front</b>, stated in the intro card. Candidates are invisible until they say yes, and approve exactly what's said about them. Hiring contacts come with a vouch too (a reverse reference). Declines are never forwarded.</p></div>
-      <div class="dec-card"><span class="q">Cold start, without lying?</span><p><b>Start where trust already lives:</b> the operator's own network of people they'd personally intro, and every match brings a new vouch. In this demo everything is fictional and labeled; a persona engine plays the other side; the counts you see are real counts of the fake data.</p></div>
-      <div class="dec-card"><span class="q">Deliberately not building</span><p>A job board, search, feeds, an apply button, resume scoring, mass outreach, ATS integrations, or big-company volume hiring. <b>Not yet:</b> voice intake calls (Photon supports calls), calendar booking, placement fees.</p></div>
+      <div class="dec-card"><span class="q">Wedge</span><p>Niche, costly roles, seed to Series B</p></div>
+      <div class="dec-card"><span class="q">Unit of signal</span><p>Vouch + intake → approved blurb</p></div>
+      <div class="dec-card"><span class="q">Who initiates</span><p>Wren; either side can start</p></div>
+      <div class="dec-card"><span class="q">Transparency</span><p>Pay first, anonymous till yes</p></div>
+      <div class="dec-card"><span class="q">Cold start</span><p>Own network; labeled fictional world</p></div>
+      <div class="dec-card"><span class="q">Not building</span><p>Job board, search, apply, ATS</p></div>
     </div>
   </section>
-  <p class="foot">Everyone here is fictional. Phone numbers use the 555-01XX range reserved for fiction. <a href="https://github.com/yslidev/wren-intro-agent">Source on GitHub</a></p>
+  <p class="foot">Fictional data · <a href="https://github.com/yslidev/wren-intro-agent">GitHub</a></p>
 </div>
 
 <script>
@@ -363,7 +355,6 @@ function renderTrack() {
 function renderCast() {
   const ppl = S.people;
   const counts = { all: ppl.length, cand: ppl.filter((p) => p.role === "candidate").length, hiring: ppl.filter((p) => p.role === "founder").length, rec: ppl.filter((p) => p.persona && p.persona.kind !== "founder").length };
-  $("cast-sub").textContent = `${counts.cand} candidates, ${counts.hiring} hiring contacts${counts.rec ? ` (${counts.rec} recruiters)` : ""}. Click to put someone on a phone.`;
   const F = [["all", "All"], ["cand", "Candidates"], ["hiring", "Hiring"], ...(counts.rec ? [["rec", "Recruiters"]] : [])];
   $("filters").innerHTML = F.map(([k, l]) => `<button class="chip" type="button" data-filter="${k}" aria-pressed="${filter === k}">${l}</button>`).join("");
   const q = query.toLowerCase();
@@ -372,9 +363,8 @@ function renderCast() {
     .slice(0, 120);
   $("cast").innerHTML = list.map((p) => {
     const sel = view.some((v) => v.person === p.id);
-    const voice = p.persona ? `<span class="tag voice">${esc(p.persona.voice)}</span>` : "";
-    return `<div class="who ${sel ? "sel" : ""}" role="button" tabindex="0" data-pick="${p.id}">${av(p)}<span class="t"><b>${esc(p.name || "New contact")}</b><small>${esc(subtitle(p))}</small></span>
-      <span style="display:grid;gap:4px;justify-items:end">${kindTag(p)}${voice || (p.role === "candidate" && !p.simulated ? `<button class="mini" type="button" data-kick="${p.id}" title="Wren texts them first">Text first</button>` : "")}</span></div>`;
+    return `<div class="who ${sel ? "sel" : ""}" role="button" tabindex="0" data-pick="${p.id}">${av(p)}<span class="t"><b>${esc(p.name || "New contact")}</b></span>
+      <span style="display:grid;gap:4px;justify-items:end">${kindTag(p)}${(p.role === "candidate" && !p.simulated ? `<button class="mini" type="button" data-kick="${p.id}" title="Wren texts them first">Text first</button>` : "")}</span></div>`;
   }).join("") || `<p class="sub">Nobody matches that search.</p>`;
 }
 
@@ -388,12 +378,12 @@ function phone(v, i) {
   v.chat = chat?.id ?? null;
   const others = chat ? chat.handles.filter((h) => h !== p.handle) : [];
   const head = !chat || !chat.isGroup
-    ? `${WREN_AV}<span class="name">Wren <small>🐦</small></span><span class="whoami">AI matchmaker · iMessage</span>`
-    : `<span class="stack">${WREN_AV}${others.map((h) => av(byHandle(h))).join("")}</span><span class="name">${esc(chat.displayName || "Group")}</span><span class="whoami">${others.length + 2} people · group chat</span>`;
+    ? `${WREN_AV}<span class="name">Wren</span>`
+    : `<span class="stack">${WREN_AV}${others.map((h) => av(byHandle(h))).join("")}</span><span class="name">${esc(chat.displayName || "Group")}</span>`;
   const tabs = chats.length > 1 ? `<div class="tabs">${chats.map((c) => `<button class="tab" type="button" data-tab="${i}" data-chat="${esc(c.id)}" aria-pressed="${c.id === v.chat}">${c.isGroup ? "👥 " + esc(c.displayName || "Group") : "🐦 Wren"}</button>`).join("")}</div>` : "";
   let msgs;
   if (!chat) {
-    msgs = `<div class="empty"><svg viewBox="0 0 64 64"><ellipse cx="32" cy="38" rx="21" ry="17" fill="#C88653"/><ellipse cx="34" cy="43" rx="12" ry="9" fill="#F6E3CC"/><circle cx="22" cy="27" r="12" fill="#C88653"/><circle cx="19" cy="25" r="2.6" fill="#1B2333"/><path d="M9 28 L2 30 L9 32 Z" fill="#FFC94A"/></svg><p style="margin:0">No texts yet.<br>${p.role === "candidate" ? `Press <b>Text first</b> in the cast, or say hi below.` : `Wren texts ${esc(p.first)} once a candidate says yes.`}</p></div>`;
+    msgs = `<div class="empty"><svg viewBox="0 0 64 64"><ellipse cx="32" cy="38" rx="21" ry="17" fill="#C88653"/><ellipse cx="34" cy="43" rx="12" ry="9" fill="#F6E3CC"/><circle cx="22" cy="27" r="12" fill="#C88653"/><circle cx="19" cy="25" r="2.6" fill="#1B2333"/><path d="M9 28 L2 30 L9 32 Z" fill="#FFC94A"/></svg><p style="margin:0">No texts yet</p></div>`;
   } else {
     msgs = chat.messages.map((m, k) => {
       const mine = m.from === p.handle, isW = m.from === S.agentHandle, prev = chat.messages[k - 1];
@@ -402,8 +392,7 @@ function phone(v, i) {
     }).join("");
     if (waitingOn(chat, p)) msgs += `<div class="typing" aria-label="Wren is typing"><i></i><i></i><i></i></div>`;
   }
-  return `<div class="phone-wrap"><span class="phone-label">${esc(p.first || "New contact")}'s phone · ${p.role === "candidate" ? "candidate" : p.persona?.kind === "founder" || !p.persona ? "founder" : "recruiter"}</span>
-    <div class="phone"><span class="notch"></span><div class="ph-head">${head}</div>${tabs}<div class="msgs">${msgs}</div>
+  return `<div class="phone-wrap">    <div class="phone"><span class="notch"></span><div class="ph-head">${head}</div>${tabs}<div class="msgs">${msgs}</div>
     <form class="composer" data-form="${i}"><input id="in-${i}" placeholder="iMessage as ${esc(p.first || "them")}" autocomplete="off" aria-label="Message"><button class="send" type="submit" aria-label="Send">↑</button></form></div></div>`;
 }
 /** Show a typing bubble when the last message is from this person in a DM (Wren is about to answer). */
@@ -424,13 +413,10 @@ function classify(e) {
 function renderThoughts() {
   const items = S.log.slice().reverse().filter((e) => showMsgs || !["inbound", "outbound"].includes(e.kind)).slice(0, 80);
   $("thoughts").innerHTML = items.map((e) => { const [c, k] = classify(e); return `<div class="thought ${c}${fresh(e.at + e.text)}"><span class="k">${k}</span><span class="v">${esc(e.text.replace(/^(gate|persona|match) ?/, ""))}</span></div>`; }).join("")
-    || `<div class="thought"><span class="v">Quiet in here. Press play and watch Wren think.</span></div>`;
+    || `<div class="thought"><span class="v">Press play</span></div>`;
 }
 
 function render() {
-  const t = $("transport").children[1], l = $("llm").children[1];
-  t.textContent = S.transport; $("transport").className = "pill on";
-  l.textContent = S.llm ? `Claude · ${S.llm}` : "rules brain"; $("llm").className = "pill" + (S.llm ? " on" : "");
   renderTrack(); renderCast(); renderThoughts();
   $("phones").innerHTML = view.map((v, i) => phone(v, i)).join("");
   for (const el of document.querySelectorAll(".msgs")) el.scrollTop = el.scrollHeight;

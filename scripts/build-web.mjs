@@ -32,4 +32,7 @@ mkdirSync("site", { recursive: true });
 const html = readFileSync("public/sim.html", "utf8")
   .replace("<title>Wren Simulator</title>", "<title>Wren Simulator</title>\n<script src=\"app.js\"></script>");
 writeFileSync("site/index.html", html);
+// The presentation deck, served at /presentation/ (GitHub Pages maps the folder to index.html).
+mkdirSync("site/presentation", { recursive: true });
+writeFileSync("site/presentation/index.html", readFileSync("docs/presentation.html", "utf8"));
 console.log("built site/index.html + site/app.js");
