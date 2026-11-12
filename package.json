@@ -1,0 +1,29 @@
+{
+  "name": "wren-intro-agent",
+  "version": "0.1.0",
+  "private": true,
+  "description": "An iMessage matchmaking agent for hiring: vets candidates and founders like a friend would, then makes double opt-in group-chat intros.",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "start": "tsx src/server.ts",
+    "test": "node --import tsx --test test/*.test.ts",
+    "typecheck": "tsc --noEmit",
+    "build:web": "node scripts/build-web.mjs"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.8.0",
+    "@hono/node-server": "^2.1.7",
+    "hono": "^4.13.18",
+    "tsx": "^4.23.15",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "typescript": "^7.0.2"
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "_note": "Synthetic, pseudonymous demo data. Every person, company and phone number here is made up (555-01xx numbers are reserved for fiction). The shapes mirror how real warm intros happen: a vouch from someone who worked with the person, a short pitch, pay and setup settled before anyone meets.",
+  "people": [
+    {
+      "id": "c_alex", "handle": "+15550100101", "name": "Alex Rivera", "first": "Alex", "role": "candidate", "stage": "new",
+      "vouch": { "name": "Maya Chen", "relation": "Alex's manager at Corvid, 2021-2024", "quote": "the best PM she's worked with on messy ops problems" },
+      "candidate": { "title": "Senior PM at Corvid (B2B payments)", "years": 6, "skills": ["payments", "onboarding", "b2b", "disputes", "growth"] }
+    },
+    {
+      "id": "c_priya", "handle": "+15550100102", "name": "Priya Raman", "first": "Priya", "role": "candidate", "stage": "ready",
+      "vouch": { "name": "Dev Patel", "relation": "Priya's cofounder at their last startup", "quote": "she shipped our eval harness in a weekend and it held up for two years" },
+      "candidate": { "title": "ML engineer, ex-founding engineer", "years": 4, "skills": ["ml", "llm", "evals", "python", "infra"], "floorK": 190, "setups": ["remote", "hybrid"], "stages": ["seed", "series a"],
+        "proudest": "Built the eval harness and fine-tuning pipeline at her last startup.", "whyLeave": "Wants to be early again, on a team that ships models to users." },
+      "blurb": "Priya Raman, ML engineer (4 yrs). Built the eval harness and fine-tuning pipeline at her last startup; her cofounder Dev Patel says she shipped it in a weekend and it held up for two years. Wants to be early again on a team shipping models to users."
+    },
+    {
+      "id": "c_jordan", "handle": "+15550100103", "name": "Jordan Lee", "first": "Jordan", "role": "candidate", "stage": "ready",
+      "vouch": { "name": "Tess Alvarez", "relation": "worked with Jordan at Fennel for 3 years", "quote": "turns a vague founder idea into a clickable prototype by Friday" },
+      "candidate": { "title": "Founding product designer", "years": 7, "skills": ["design", "brand", "consumer", "prototyping"], "floorK": 170, "setups": ["onsite", "hybrid"], "stages": ["seed", "series a"] },
+      "blurb": "Jordan Lee, founding product designer (7 yrs). Tess Alvarez, who worked with Jordan for 3 years, says Jordan turns a vague founder idea into a clickable prototype by Friday."
+    },
+    {
+      "id": "c_nina", "handle": "+15550100104", "name": "Nina Okafor", "first": "Nina", "role": "candidate", "stage": "ready",
+      "vouch": { "name": "Omar Haddad", "relation": "Nina's tech lead at Brisk", "quote": "the engineer everyone pings when payments break at 2am" },
+      "candidate": { "title": "Full-stack engineer", "years": 3, "skills": ["typescript", "react", "node", "payments"], "floorK": 150, "setups": ["remote"], "stages": ["seed", "series a", "series b"] },
+      "blurb": "Nina Okafor, full-stack engineer (3 yrs, TypeScript and payments). Her tech lead Omar Haddad calls her the engineer everyone pings when payments break at 2am."
+    },
+    {
+      "id": "f_sam", "handle": "+15550100201", "name": "Sam Whitaker", "first": "Sam", "role": "founder", "stage": "ready",
+      "vouch": { "name": "Lena Park", "relation": "Sam's investor at Northbeam", "quote": "gives PMs a whole problem and gets out of the way" },
+      "founder": { "company": "Marigold", "stage": "series a", "sector": "consumer fintech", "roleTitle": "Senior PM, Growth (first PM hire)", "bandK": [180, 200], "equity": "0.25-0.40%", "setup": "remote",
+        "mustHaves": ["growth", "onboarding", "fintech", "payments"], "problem": "only 38% of people who sign up ever fund their account", "slots": ["Thu 10:00 AM PT", "Thu 2:00 PM PT", "Fri 11:00 AM PT"] }
+    },
+    {
+      "id": "f_chris", "handle": "+15550100202", "name": "Chris Bauer", "first": "Chris", "role": "founder", "stage": "ready",
+      "vouch": { "name": "Ana Morales", "relation": "worked with Chris at Freightline", "quote": "the most organized VP I've reported to" },
+      "founder": { "company": "Atlas Route", "stage": "series b", "sector": "logistics payments", "roleTitle": "Senior PM, Carrier Payments", "bandK": [185, 210], "equity": "0.10-0.15%", "setup": "remote",
+        "mustHaves": ["payments", "b2b", "marketplace"], "problem": "carriers wait 30 days to get paid", "slots": ["Mon 10:30 AM PT", "Tue 9:00 AM PT"] }
+    },
+    {
+      "id": "f_ravi", "handle": "+15550100203", "name": "Ravi Shah", "first": "Ravi", "role": "founder", "stage": "ready",
+      "vouch": { "name": "Dev Patel", "relation": "fellow founder in the same batch", "quote": "ships every week and tells you exactly where you stand" },
+      "founder": { "company": "Loomwork", "stage": "seed", "sector": "AI workflow automation", "roleTitle": "Founding ML Engineer", "bandK": [180, 220], "equity": "0.8-1.5%", "setup": "hybrid",
+        "mustHaves": ["ml", "llm", "evals", "infra"], "problem": "their agent works in demos but nobody can tell when it silently gets worse", "slots": ["Wed 11:00 AM PT", "Thu 4:00 PM PT"] }
+    },
+    {
+      "id": "f_mei", "handle": "+15550100204", "name": "Mei Tan", "first": "Mei", "role": "founder", "stage": "ready",
+      "vouch": { "name": "Tess Alvarez", "relation": "Mei's former design lead", "quote": "has taste and listens to designers" },
+      "founder": { "company": "Kiln", "stage": "seed", "sector": "consumer social", "roleTitle": "Founding Designer", "bandK": [160, 185], "equity": "0.5-1.0%", "setup": "onsite",
+        "mustHaves": ["design", "consumer", "prototyping", "brand"], "problem": "the app works but nobody remembers it", "slots": ["Tue 1:00 PM PT", "Wed 3:00 PM PT"] }
+    }
+  ]
+}

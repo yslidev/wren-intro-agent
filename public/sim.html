@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wren Simulator</title>
+<style>
+:root {
+  --bg: #F3F4F7; --surface: #FFFFFF; --surface-2: #ECEEF3; --ink: #121826; --muted: #5C6577; --line: #DCE0E8;
+  --me: #2F6BFF; --me-ink: #FFFFFF; --them: #E7E9EF; --wren: #E4F1EA; --wren-ink: #0F5132; --accent: #2F6BFF;
+  --dec: #7A5A00; --err: #B4372F; --frame: #1A1F2B;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --bg: #0C0F15; --surface: #151A24; --surface-2: #1D2330; --ink: #E7EBF3; --muted: #99A2B4; --line: #2A3141;
+    --them: #262D3B; --wren: #163126; --wren-ink: #9BE0BC; --dec: #E7C267; --err: #F2847B; --frame: #2A3141; color-scheme: dark; }
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 14px/1.45 -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", sans-serif; }
+header { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 12px 20px; background: var(--surface); border-bottom: 1px solid var(--line); }
+header h1 { font-size: 17px; margin: 0; letter-spacing: -0.01em; }
+.badge { font-size: 12px; padding: 3px 9px; border-radius: 999px; background: var(--surface-2); color: var(--muted); }
+.badge.on { background: var(--wren); color: var(--wren-ink); }
+.sp { flex: 1; }
+button { font: inherit; cursor: pointer; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 8px; padding: 6px 12px; }
+button.primary { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 600; }
+button:disabled { opacity: .5; cursor: default; }
+main { display: grid; grid-template-columns: 250px minmax(0, 1fr) 340px; gap: 16px; padding: 16px 20px; align-items: start; }
+@media (max-width: 1150px) { main { grid-template-columns: minmax(0, 1fr); } }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+.panel h2 { font-size: 13px; margin: 0; padding: 10px 14px; border-bottom: 1px solid var(--line); color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .05em; }
+.person { padding: 10px 14px; border-bottom: 1px solid var(--line); display: grid; gap: 4px; }
+.person:last-child { border-bottom: 0; }
+.person .top { display: flex; justify-content: space-between; gap: 8px; align-items: center; }
+.person b { font-weight: 600; }
+.person small { color: var(--muted); }
+.person .acts { display: flex; gap: 6px; flex-wrap: wrap; }
+.person .acts button { padding: 3px 8px; font-size: 12px; }
+.phones { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 760px) { .phones { grid-template-columns: minmax(0, 1fr); } }
+.phone { background: var(--surface); border: 8px solid var(--frame); border-radius: 34px; height: 680px; display: flex; flex-direction: column; overflow: hidden; min-width: 0; }
+.ph-top { padding: 10px 12px 6px; border-bottom: 1px solid var(--line); display: grid; gap: 6px; }
+.ph-top select { font: inherit; padding: 4px 6px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface-2); color: var(--ink); }
+.tabs { display: flex; gap: 6px; overflow-x: auto; }
+.tab { font-size: 12px; padding: 3px 10px; border-radius: 999px; white-space: nowrap; }
+.tab[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.msgs { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 4px; }
+.empty { color: var(--muted); text-align: center; margin: auto; font-size: 13px; padding: 20px; }
+.b { max-width: 82%; padding: 7px 11px; border-radius: 17px; white-space: pre-wrap; word-wrap: break-word; position: relative; }
+.b.me { align-self: flex-end; background: var(--me); color: var(--me-ink); }
+.b.them { align-self: flex-start; background: var(--them); }
+.b.wren { align-self: flex-start; background: var(--wren); color: var(--wren-ink); }
+.who { font-size: 11px; color: var(--muted); margin: 6px 6px 0; }
+.who.r { align-self: flex-end; }
+.tap { position: absolute; top: -10px; right: -6px; background: var(--surface); border: 1px solid var(--line); border-radius: 999px; font-size: 11px; padding: 0 5px; }
+.composer { display: flex; gap: 6px; padding: 8px; border-top: 1px solid var(--line); }
+.composer input { flex: 1; min-width: 0; font: inherit; padding: 8px 12px; border-radius: 18px; border: 1px solid var(--line); background: var(--surface-2); color: var(--ink); }
+.log { max-height: 720px; overflow-y: auto; font: 12px/1.45 ui-monospace, "SF Mono", Menlo, monospace; }
+.log div { padding: 6px 12px; border-bottom: 1px solid var(--line); word-wrap: break-word; }
+.log .decision { color: var(--dec); }
+.log .llm { color: var(--accent); }
+.log .error { color: var(--err); }
+.log .inbound, .log .outbound { color: var(--muted); }
+.note { font-size: 12.5px; color: var(--muted); padding: 10px 14px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Wren · iMessage intro agent</h1>
+  <span class="badge" id="transport"></span>
+  <span class="badge" id="llm"></span>
+  <span class="sp"></span>
+  <button id="demo" class="primary" type="button">Play the Alex + Sam demo</button>
+  <button id="reset" type="button">Reset</button>
+</header>
+<main>
+  <section class="panel">
+    <h2>People</h2>
+    <div id="people"></div>
+    <p class="note">Synthetic people and numbers. "Text first" makes Wren open the thread, using the vouch.</p>
+  </section>
+  <section class="phones" id="phones"></section>
+  <section class="panel">
+    <h2>What Wren is deciding</h2>
+    <div class="log" id="log"></div>
+  </section>
+</main>
+<script>
+let S = null;
+const view = [{ person: "c_alex", chat: null }, { person: "f_sam", chat: null }];
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const token = () => { try { return localStorage.getItem("wren-admin") || ""; } catch { return ""; } };
+// On GitHub Pages the agent runs in this page (window.WREN_API from app.js); on a server it's behind /api.
+const API = window.WREN_API;
+const post = (url, body) => API ? API.post(url, body) : fetch(url, { method: "POST", headers: { "content-type": "application/json", "x-admin-token": token() }, body: JSON.stringify(body || {}) });
+
+async function load() { S = API ? structuredClone(await API.state()) : await (await fetch("/api/state")).json(); render(); }
+
+function chatsFor(p) { return S.chats.filter((c) => c.handles.includes(p.handle)); }
+function nameOf(h) { if (h === S.agentHandle) return "Wren"; return S.people.find((p) => p.handle === h)?.first ?? h; }
+function introStatus(p) {
+  const i = [...S.intros].reverse().find((x) => x.candidateId === p.id || x.founderId === p.id);
+  return i ? i.status.replace(/_/g, " ") : p.stage;
+}
+
+function render() {
+  $("transport").textContent = `transport: ${S.transport}`;
+  $("llm").textContent = S.llm ? `brain: ${S.llm}` : "brain: rules (no API key)";
+  $("llm").className = "badge" + (S.llm ? " on" : "");
+  $("people").innerHTML = S.people.map((p) => `<div class="person"><div class="top"><b>${esc(p.name)}</b><small>${p.role}</small></div>
+    <small>${esc(introStatus(p))}${p.vouch ? ` · vouched by ${esc(p.vouch.name)}` : ""}</small>
+    <div class="acts"><button data-kick="${p.id}" type="button">Text first</button><button data-show="${p.id}" data-slot="0" type="button">Phone 1</button><button data-show="${p.id}" data-slot="1" type="button">Phone 2</button></div></div>`).join("");
+  $("phones").innerHTML = view.map((v, i) => phone(v, i)).join("");
+  for (const el of document.querySelectorAll(".msgs")) el.scrollTop = el.scrollHeight;
+  const log = $("log");
+  log.innerHTML = S.log.slice().reverse().map((e) => `<div class="${e.kind}">${esc(e.kind === "decision" ? "▸ " + e.text : e.text)}</div>`).join("");
+}
+
+function phone(v, i) {
+  const p = S.people.find((x) => x.id === v.person);
+  const chats = chatsFor(p);
+  // Follow the thread with the newest message unless the viewer picked a tab.
+  const newest = [...chats].sort((a, b) => (b.messages.at(-1)?.at ?? "").localeCompare(a.messages.at(-1)?.at ?? ""))[0];
+  const chat = (v.userPicked && chats.find((c) => c.id === v.chat)) || newest;
+  v.chat = chat?.id ?? null;
+  const tabs = chats.map((c) => `<button class="tab" type="button" data-tab="${i}" data-chat="${esc(c.id)}" aria-pressed="${c.id === v.chat}">${c.isGroup ? esc(c.displayName || "Group") : "Wren"}</button>`).join("");
+  const msgs = chat ? chat.messages.map((m, k) => {
+    const mine = m.from === p.handle, isW = m.from === S.agentHandle;
+    const prev = chat.messages[k - 1];
+    const label = chat.isGroup && !mine && prev?.from !== m.from ? `<div class="who">${esc(nameOf(m.from))}</div>` : "";
+    return `${label}<div class="b ${mine ? "me" : isW ? "wren" : "them"}">${esc(m.text)}${m.reaction ? '<span class="tap">❤️ Wren</span>' : ""}</div>`;
+  }).join("") : `<div class="empty">No messages yet. Press "Text first" to have Wren reach out, or send a text.</div>`;
+  const opts = S.people.map((x) => `<option value="${x.id}" ${x.id === p.id ? "selected" : ""}>${esc(x.name)} (${x.role})</option>`).join("");
+  return `<div class="phone"><div class="ph-top"><select data-pick="${i}" aria-label="Whose phone">${opts}</select><div class="tabs">${tabs}</div></div>
+    <div class="msgs">${msgs}</div>
+    <form class="composer" data-form="${i}"><input id="in-${i}" placeholder="Text as ${esc(p.first)}…" autocomplete="off" aria-label="Message"><button type="submit">Send</button></form></div>`;
+}
+
+document.addEventListener("click", async (e) => {
+  const b = e.target.closest("button"); if (!b) return;
+  if (b.dataset.kick) { await post(`/api/kickoff/${b.dataset.kick}`); }
+  if (b.dataset.show) { view[+b.dataset.slot] = { person: b.dataset.show, chat: null }; render(); }
+  if (b.dataset.tab) { view[+b.dataset.tab].chat = b.dataset.chat; view[+b.dataset.tab].userPicked = true; render(); }
+  if (b.id === "reset") { await post("/api/reset"); view[0] = { person: "c_alex", chat: null }; view[1] = { person: "f_sam", chat: null }; }
+});
+document.addEventListener("change", (e) => {
+  if (e.target.dataset.pick !== undefined) { view[+e.target.dataset.pick] = { person: e.target.value, chat: null }; render(); }
+});
+document.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const i = +e.target.dataset.form, input = $(`in-${i}`), text = input.value.trim();
+  if (!text) return;
+  const p = S.people.find((x) => x.id === view[i].person);
+  input.value = "";
+  await post("/api/sim/send", { from: p.handle, chatId: view[i].chat || `dm:${p.handle}`, text });
+});
+
+// ---- scripted demo: drives the real agent by texting as Alex and Sam
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+async function until(fn, ms = 60000) { const t = Date.now(); while (Date.now() - t < ms) { await load(); const v = fn(); if (v) return v; await sleep(400); } throw new Error("demo timed out"); }
+const lastWren = (chatId) => S.chats.find((c) => c.id === chatId)?.messages.filter((m) => m.from === S.agentHandle).at(-1)?.text ?? "";
+const countWren = (chatId) => S.chats.find((c) => c.id === chatId)?.messages.filter((m) => m.from === S.agentHandle).length ?? 0;
+async function say(handle, text, chatId) { await sleep(900); await post("/api/sim/send", { from: handle, chatId: chatId || `dm:${handle}`, text }); }
+async function afterWren(chatId, fn) { const n = countWren(chatId); await fn(); await until(() => countWren(chatId) > n); }
+
+$("demo").addEventListener("click", async () => {
+  const btn = $("demo"); btn.disabled = true; btn.textContent = "Playing…";
+  try {
+    await post("/api/reset"); await load();
+    const A = S.people.find((p) => p.id === "c_alex").handle, M = S.people.find((p) => p.id === "f_sam").handle;
+    const dmA = `dm:${A}`;
+    view[0] = { person: "c_alex", chat: null }; view[1] = { person: "f_sam", chat: null };
+    await afterWren(dmA, () => post("/api/kickoff/c_alex"));
+    await afterWren(dmA, () => say(A, "Rebuilt dispute handling for 2,000 merchants at Corvid. Cut resolution time from 9 days to 2."));
+    await afterWren(dmA, () => say(A, "Smaller team, more ownership. I want to own a whole problem, not a slice."));
+    await afterWren(dmA, () => say(A, "$180k base, remote or hybrid in SF"));
+    await until(() => /change\?/i.test(lastWren(dmA)));
+    await afterWren(dmA, () => say(A, "Looks right, send it when it makes sense"));
+    await until(() => /intro\?/i.test(lastWren(dmA)), 90000);
+    await say(A, "Yes, intro me");
+    await until(() => /intro/i.test(lastWren(`dm:${M}`)));
+    await say(M, "Yes please. The dispute work is exactly our kind of problem.");
+    const g = await until(() => S.chats.find((c) => c.isGroup && c.handles.includes(A)));
+    await until(() => countWren(g.id) >= 3);
+    await say(M, "Alex, great to meet you! Thursday at 10 or 2 PT?", g.id);
+    await sleep(1500);
+    await afterWren(g.id, () => say(A, "Thursday 10 works. Looking forward to it.", g.id));
+    await say(M, "@wren thanks!", g.id);
+    await until(() => /how did it go/i.test(lastWren(dmA)), 90000);
+    await say(A, "Really good. Next step is a working session with the team.");
+    await say(M, "Great call. Moving Alex to the working session.");
+    await sleep(1200); await load();
+  } catch (err) { console.error(err); btn.textContent = "Demo stopped: " + err.message; await sleep(2500); }
+  btn.disabled = false; btn.textContent = "Play the Alex + Sam demo";
+});
+
+load();
+let pending;
+const refresh = () => { clearTimeout(pending); pending = setTimeout(load, 120); };
+if (API) API.subscribe(refresh);
+else {
+  try { new EventSource("/api/events").addEventListener("change", refresh); }
+  catch { setInterval(load, 1500); }
+}
+</script>
+</body>
+</html>
