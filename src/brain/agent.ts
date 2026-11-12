@@ -518,7 +518,9 @@ export class Agent {
     const chat = this.store.dmChatFor(p.handle);
     const history = (chat?.messages ?? []).map((m) => ({ who: this.nameOf(m.from), text: m.text }));
     const open = this.store.intros.filter((i) => i.candidateId === p.id || i.founderId === p.id);
-    const status = p.role === "founder" ? say.statusFounder : open.length ? say.statusOpen : say.statusNone;
+    const base = p.role === "founder" ? say.statusFounder : open.length ? say.statusOpen : say.statusNone;
+    const feel = say.feel(`${p.id}:${history.length}`, history.at(-1)?.text ?? "");
+    const status = feel ? `${feel} ${base}` : base;
     await this.dm(p, await this.brain.chat(p, history, status));
   }
 

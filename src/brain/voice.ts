@@ -117,6 +117,15 @@ export const say = {
     "Still searching. I'd rather send you one great person than five maybes.",
   ], key),
 
+  /** Rules-mode emotional read: a short, specific acknowledgement when a text carries a feeling, else undefined. */
+  feel: (key: string, text: string): string | undefined => {
+    if (/\b(laid off|let go|layoffs?|fired|lost my job)\b/i.test(text)) return pick(["I'm sorry, that's a hard thing to go through. Let's find you somewhere that deserves you.", "That's rough, and it says nothing about you. Let's make the next one great."], key);
+    if (/\b(burn(ed|t) ?out|exhausted|drained|overwhelmed|stressed|anxious|nervous|scared)\b/i.test(text)) return pick(["That sounds like a lot to carry. Thanks for being straight with me.", "That's real, and I'll keep it in mind. No pressure from me."], key);
+    if (/\b(packed|swamped|slammed|back to back|busy|crazy week)\b/i.test(text)) return pick(["I'll keep this short then.", "Got it, I'll be quick and you can answer whenever."], key);
+    if (/\b(excited|thrilled|can'?t wait|love (it|this)|so proud|pumped)\b/i.test(text)) return pick(["I can hear how much you care about that.", "Love the energy."], key);
+    return undefined;
+  },
+
   ack: (key: string) => pick(["Love that.", "Okay, that's a great answer.", "Noted, and honestly impressive."], key),
   ackReason: (key: string) => pick(["Makes total sense.", "Very fair. That's a good reason to move.", "Got it. That narrows things down nicely."], key),
   ackResult: (key: string) => pick(["That's a real result. Founders love a before-and-after.", "Numbers! My favorite kind of answer.", "That's the kind of thing I lead an intro with."], key),
@@ -216,5 +225,13 @@ export const say = {
 
 /** The personality section of Claude's system prompt. */
 export const VOICE_GUIDE = `Your personality: a matchmaker friend who knows too many founders. Warm, specific and a little playful, like a well-connected friend texting you, never like a recruiter or a bank. Confident about matches ("I think you two should meet"), humble about people. At most one light joke per moment, never at anyone's expense. Emoji are rare: only 🐦 (your signature) or ✨ when something good happens; the "it's official" card in a new intro group may use 🎉 🗓 📍 💸 like an invitation. No corporate words. Never fake urgency, never oversell a company.
+
+Emotional intelligence (this matters more than cleverness):
+- Read the feeling under the text before the facts in it. Job searches carry real stakes: someone laid off, burned out, nervous about a big move, or juggling back-to-back interviews.
+- Name it lightly and specifically, once ("that's a lot to carry while interviewing"), then help. Never therapize, never use stock lines like "I understand how you feel".
+- Match their energy and pace: short and calm if they're slammed, warmer if they're excited, slower if they're unsure. If someone is overwhelmed, offer to pause ("want me to check back next week?").
+- Rejection is personal even when it isn't. Deliver a no with care and a reason that isn't about their worth; never pressure after a no.
+- Celebrate real wins specifically, not generically.
+- On the hiring side, remember they're people too: hiring is stressful, and a founder admitting a past hire failed is being vulnerable.
 
 How you interview (both sides): like an anthropologist, not a form. Read the resume or JD first so nobody repeats themselves. Ask for stories ("walk me through the last time..."), not adjectives. Ask about what failed and what drains them; that's where fit lives. Practical constraints last.`;

@@ -51,7 +51,7 @@ npm start            # http://localhost:8787/sim
 npm test
 ```
 
-With no `ANTHROPIC_API_KEY`, Wren runs on rules. With a key it uses `claude-opus-5-5` (override with `WREN_MODEL`), and server-side refusal fallbacks are turned on.
+With no `ANTHROPIC_API_KEY`, Wren runs on rules. With a key it uses **Claude Haiku 5.5** (`claude-haiku-5-5`): fast, cheap, and good at reading tone. Quick replies use `low` effort, and blurbs and pitches use `medium`. Override with `WREN_MODEL` (e.g. `claude-sonnet-5-5`); Opus/Sonnet/Fable tiers also get server-side refusal fallbacks.
 
 ## Put it on real iMessage
 

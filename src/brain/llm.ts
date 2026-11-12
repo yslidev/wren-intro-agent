@@ -39,12 +39,16 @@ export class Brain {
   /** One structured call. Returns null on any failure so callers fall back to the rule-based path. */
   private async ask<S extends z.ZodType>(name: string, schema: S, task: string, input: string, effort: Effort): Promise<z.infer<S> | null> {
     if (!this.client) return null;
+    // Server-side refusal fallbacks exist for the Opus/Sonnet/Fable tiers; Haiku 5.5 has none, and a refusal
+    // there simply drops to Wren's rule-based line.
+    const fallback = /opus|sonnet|fable|mythos/.test(this.model)
+      ? { betas: ["server-side-fallback-2026-07-01"], fallbacks: "default" as const }
+      : {};
     try {
       const res = await this.client.beta.messages.parse({
         model: this.model,
-        max_tokens: 8000,
-        betas: ["server-side-fallback-2026-07-01"],
-        fallbacks: "default",
+        max_tokens: 8000, // room for adaptive thinking plus a few texts
+        ...fallback,
         output_config: { effort, format: betaZodOutputFormat(schema) },
         system: [
           { type: "text", text: PERSONA, cache_control: { type: "ephemeral" } },
@@ -84,10 +88,11 @@ export class Brain {
     if (out) return out;
     const floor = extractFloorK(answer), setups = extractSetups(answer);
     const key = `${p.id}:${p.asked}`;
-    const ack = !nextQuestion && (floor || setups.length)
+    // Feelings first: if the answer carries one, acknowledge that before anything else.
+    const ack = say.feel(key, answer) ?? (!nextQuestion && (floor || setups.length)
       ? `Got it: ${[floor ? `$${floor}K floor` : "", setups.join(" or ")].filter(Boolean).join(", ")}.`
       : /\d/.test(answer) && /from|to|cut|grew|%|x\b/i.test(answer) ? say.ackResult(key)
-      : p.asked === 2 ? say.ackReason(key) : say.ack(key);
+      : p.asked === 2 ? say.ackReason(key) : say.ack(key));
     return {
       reply: nextQuestion ? `${ack} ${nextQuestion}` : ack,
       floorK: extractFloorK(answer) ?? null,

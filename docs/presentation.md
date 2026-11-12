@@ -46,7 +46,7 @@ A running list for the work-trial presentation. Newest changes at the top of eac
   - **Photon Spectrum** (cloud iMessage; live on +1 415-603-5536)
   - Linq (real group chats, signed message notifications)
   - Photon imessage-kit (runs on your own Mac)
-- **Claude (`claude-opus-5-5`)** writes the texts when an API key is set; the rule-based version runs without one. Server-side refusal fallbacks are on.
+- **Claude Haiku 5.5** (`claude-haiku-5-5`) writes the texts when an API key is set: fast, light, and prompted for emotional intelligence. The rule-based version runs without a key.
 - **Safety:**
   - Fictional people are never texted over a real network.
   - STOP and the other carrier opt-out words are respected.
@@ -69,6 +69,8 @@ A running list for the work-trial presentation. Newest changes at the top of eac
 
 ## Changes we made (and why)
 
+- **Switched to a smaller, faster model with emotional intelligence.** Moved from Opus 5.5 to Haiku 5.5 for speed and cost. Added an EQ section to Wren's prompt (read the feeling first, name it once, match the person's pace, deliver a no with care). Rules mode also acknowledges layoffs, stress, busy weeks and excitement before moving on.
+- **`.env` has a place for the Claude key** (`ANTHROPIC_API_KEY=`), which was missing.
 - **Wren reads intake answers properly (from live testing).** Greetings ("Yo") are no longer taken as names, a late "my name is…" updates the name, a sentence like "I’m open to sth new" is no longer taken as the voucher, and "nobody" is an accepted answer. With an API key, Claude reads these answers; without one, stricter rules do. Match reasons now say "you" when Wren talks to the candidate.
 - **Grammar pass on Wren's lines.** Fixed "Hi! I'm Wren 🐦 an AI matchmaker" (missing comma), the doubled "Nice to meet you", and similar run-ons.
 - **Smart punctuation from iPhones is understood (live bug).** The first real test on the live line read "I’m Yushan" as the name "I’m", because iPhones send curly apostrophes. Every incoming text is now normalized to plain punctuation, and a test covers it.

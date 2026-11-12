@@ -160,3 +160,10 @@ test("first contact replays the live transcript: greetings aren't names, late co
   assert.equal(store.byHandle(P)!.vouch!.name, "Aiden Bai");
   assert.match(last(), /resume/i);
 });
+
+test("rules-mode emotional read: feelings get acknowledged before facts", async () => {
+  const { say } = await import("../src/brain/voice.js");
+  assert.match(say.feel("k", "honestly I got laid off last month")!, /sorry|rough/i);
+  assert.match(say.feel("k", "I'm packed with back to back interviews this week")!, /short|quick/i);
+  assert.equal(say.feel("k", "Rebuilt the billing pipeline"), undefined);
+});

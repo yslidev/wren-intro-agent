@@ -20,7 +20,7 @@ export const config = {
   },
   port: Number(env("PORT", "8787")),
   adminToken: env("ADMIN_TOKEN"),
-  model: env("WREN_MODEL", "claude-opus-5-5"),
+  model: env("WREN_MODEL", "claude-haiku-5-5"),
   llmEnabled: Boolean(env("ANTHROPIC_API_KEY") || env("ANTHROPIC_AUTH_TOKEN")) && env("LLM", "auto") !== "off",
   linq: {
     token: env("LINQ_API_TOKEN"),
