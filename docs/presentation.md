@@ -69,6 +69,7 @@ A running list for the work-trial presentation. Newest changes at the top of eac
 
 ## Changes we made (and why)
 
+- **The deck explains the product thinking.** It maps the work-trial brief to slides, states the stance (hiring is a human-connection problem), the insight (the best intros come from friends), five design principles, a walkthrough of what each feature does and why, the anti-features, how it was built with AI (prompting, pushback, tools), and what comes next.
 - **Presentation deck + leaner web app.** Added an HTML deck at /presentation with a detailed architecture diagram and one-line feature lists, and removed secondary labels and long descriptions from the demo.
 - **Wren adapts awkward questions (found testing Haiku live).** Asked "what would make you leave where you are now?" right after someone said they were laid off. Claude now keeps each question's meaning but rewords it to fit the person (e.g. "what would make a next role feel right?"), and acknowledges the feeling first.
 - **Switched to a smaller, faster model with emotional intelligence.** Moved from Opus 5.5 to Haiku 5.5 for speed and cost. Added an EQ section to Wren's prompt (read the feeling first, name it once, match the person's pace, deliver a no with care). Rules mode also acknowledges layoffs, stress, busy weeks and excitement before moving on.

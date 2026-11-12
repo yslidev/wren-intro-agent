@@ -55,7 +55,7 @@ ul.short li::before { content: ""; width: 7px; height: 7px; border-radius: 50%; 
 .split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 40px; align-items: center; }
 @media (max-width: 900px) { .split { grid-template-columns: minmax(0, 1fr); } }
 .arch { background: var(--surface); border-radius: 24px; border: 1px solid var(--line); padding: 12px; overflow-x: auto; }
-.arch svg { width: 100%; min-width: 900px; height: auto; display: block; }
+.arch svg { width: 100%; min-width: 900px; height: auto; max-height: 72vh; display: block; }
 .legend { display: flex; gap: 22px; flex-wrap: wrap; font-size: 14px; color: var(--muted); }
 .legend span { display: inline-flex; gap: 8px; align-items: center; }
 .legend i { width: 26px; border-top: 2px solid var(--muted); display: inline-block; }
@@ -67,6 +67,21 @@ svg text { font-family: var(--f); }
 .t1 { font-size: 14px; font-weight: 800; fill: var(--ink); }
 .t2 { font-size: 12px; font-weight: 600; fill: var(--muted); }
 .tc { font-size: 13px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+.why { display: grid; gap: 14px; }
+.why .card { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.4fr); gap: 6px 22px; align-items: start; }
+@media (max-width: 900px) { .why .card { grid-template-columns: minmax(0, 1fr); } }
+.why h3 { font-size: 20px; }
+.why .what { color: var(--muted); font-size: 16px; margin-top: 4px; }
+.why .because { font-size: 17px; color: var(--ink); margin: 0; }
+.why .because b { color: var(--wren); }
+.chip { display: inline-block; font: 500 12px var(--mono); padding: 3px 9px; border-radius: 999px; background: var(--wren-soft); color: var(--wren); margin-top: 6px; letter-spacing: .02em; }
+.map { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px 24px; font-size: 18px; align-items: baseline; }
+.map .ask { color: var(--ink); }
+.map .where { font: 500 14px var(--mono); color: var(--wren); white-space: nowrap; }
+.big-quote { font-size: clamp(28px, 3.4vw, 42px); line-height: 1.2; font-weight: 800; letter-spacing: -0.02em; max-width: 24ch; margin: 0; }
+.pr { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; }
+@media (max-width: 1000px) { .pr { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.pr .card h3 { font-size: 18px; }
 @media print { html { scroll-snap-type: none; } .slide { page-break-after: always; min-height: auto; } .nav, .bar { display: none; } }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 </style>
@@ -91,14 +106,67 @@ svg text { font-family: var(--f); }
   </div>
 </section>
 
-<!-- 2. Angle -->
+<!-- The brief -->
 <section class="slide">
-  <span class="kicker">The angle</span>
-  <h2>The best hires come from <span>“you two should meet”</span></h2>
+  <span class="kicker">The work trial</span>
+  <h2>The brief, and where this deck answers it</h2>
+  <div class="card map">
+    <span class="ask">Pick an angle the incumbents don't have</span><span class="where">→ stance, insight</span>
+    <span class="ask">Experience it as a candidate or an employer</span><span class="where">→ live demo, 3 flows</span>
+    <span class="ask">The moment of connection, and why it beats LinkedIn</span><span class="where">→ group chat</span>
+    <span class="ask">Wedge · unit of signal · who initiates · transparency · cold start</span><span class="where">→ decisions</span>
+    <span class="ask">What you're deliberately not building</span><span class="where">→ anti-features</span>
+    <span class="ask">Prompting approach, pushing back on the model, AI tools</span><span class="where">→ built with AI</span>
+  </div>
+</section>
+
+<!-- Stance -->
+<section class="slide">
+  <span class="kicker">Our stance</span>
+  <p class="big-quote">Hiring is a <span style="color:var(--wren)">human connection</span> problem, not a search problem.</p>
   <div class="grid g3">
     <div class="card"><h3>Job boards</h3><p>Shouting into a void</p></div>
     <div class="card"><h3>Recruiters</h3><p>Drowning in low signal</p></div>
     <div class="card hot"><h3>Wren</h3><p>A friend who vetted you both</p></div>
+  </div>
+</section>
+
+<!-- Insight -->
+<section class="slide">
+  <span class="kicker">The insight</span>
+  <div class="split">
+    <div class="grid" style="gap:18px">
+      <h2>The best intros in my career came from <span>friends</span>, in a group text</h2>
+      <ul class="short">
+        <li>Someone who knew both of us</li>
+        <li>One line about each person</li>
+        <li>Then they stepped out</li>
+        <li>Ditto proved an agent can do this, for dating</li>
+      </ul>
+    </div>
+    <div class="chat" aria-label="A friend's intro, the pattern Wren copies">
+      <div class="head">A friend's intro (names changed)</div>
+      <div class="who">Sam</div>
+      <div class="b t">Riley &lt;&gt; Dee</div>
+      <div class="b t">Dee is a friend, hiring a founding engineer</div>
+      <div class="b t">Riley shipped one-tap checkout at a fintech</div>
+      <div class="who">Dee</div>
+      <div class="b t">Hey Riley! Sam mentioned you. Happy to chat through what we do.</div>
+      <div class="b m">I'd love to learn more :)</div>
+    </div>
+  </div>
+</section>
+
+<!-- Principles -->
+<section class="slide">
+  <span class="kicker">Design principles</span>
+  <h2>Five rules every feature follows</h2>
+  <div class="pr">
+    <div class="card"><span class="num">1</span><h3>Trust travels through people</h3><p>Every intro starts with a vouch</p></div>
+    <div class="card"><span class="num">2</span><h3>Consent before contact</h3><p>Nobody gets a cold message</p></div>
+    <div class="card"><span class="num">3</span><h3>Stories over keywords</h3><p>Fit lives in what people did</p></div>
+    <div class="card"><span class="num">4</span><h3>One great match</h3><p>Not ten okay ones</p></div>
+    <div class="card"><span class="num">5</span><h3>Host, then step out</h3><p>The connection is theirs</p></div>
   </div>
 </section>
 
@@ -139,6 +207,59 @@ svg text { font-family: var(--f); }
     <div class="card"><span class="num">2</span><h3>Match</h3><p>One person, with reasons</p></div>
     <div class="card"><span class="num">3</span><h3>Double opt-in</h3><p>Asked privately</p></div>
     <div class="card"><span class="num">4</span><h3>Group chat</h3><p>Intro, time, step out</p></div>
+  </div>
+</section>
+
+<!-- Features, with the why -->
+<section class="slide">
+  <span class="kicker">Feature walkthrough · 1 of 4</span>
+  <h2>Getting to know people</h2>
+  <div class="why">
+    <div class="card"><div><h3>Resume or JD first</h3><div class="what">Wren reads it before asking anything</div></div>
+      <p class="because"><b>Why:</b> respect people's time. Nobody should repeat what's already written down.<br><span class="chip">stories over keywords</span></p></div>
+    <div class="card"><div><h3>Four story questions</h3><div class="what">Proudest work, what drains you, what failed before, the honest catch</div></div>
+      <p class="because"><b>Why:</b> fit lives in stories and failures, not adjectives. Interview like an anthropologist, not a form.<br><span class="chip">stories over keywords</span></p></div>
+    <div class="card"><div><h3>The vouch</h3><div class="what">“Who sent you my way?”</div></div>
+      <p class="because"><b>Why:</b> trust transfers through people. The vouch travels with every intro, just like a friend's.<br><span class="chip">trust travels through people</span></p></div>
+  </div>
+</section>
+
+<section class="slide">
+  <span class="kicker">Feature walkthrough · 2 of 4</span>
+  <h2>Making the match</h2>
+  <div class="why">
+    <div class="card"><div><h3>Approved blurb + role card</h3><div class="what">Each side signs off on how they're described</div></div>
+      <p class="because"><b>Why:</b> you own your story. Nothing is said about you without your OK.<br><span class="chip">consent before contact</span></p></div>
+    <div class="card"><div><h3>Filters, then reasons</h3><div class="what">Role, pay, setup, 2+ shared skills; every point explained</div></div>
+      <p class="because"><b>Why:</b> honest and explainable. Mismatches never reach a human, and “why you two” is in plain words.<br><span class="chip">one great match</span></p></div>
+    <div class="card"><div><h3>One at a time, anonymous till yes</h3><div class="what">Double opt-in, asked privately</div></div>
+      <p class="because"><b>Why:</b> dignity. No cold messages, no public rejection, and Wren's reputation stays a friend's reputation.<br><span class="chip">consent before contact</span></p></div>
+  </div>
+</section>
+
+<section class="slide">
+  <span class="kicker">Feature walkthrough · 3 of 4</span>
+  <h2>The connection, and after</h2>
+  <div class="why">
+    <div class="card"><div><h3>The group chat ritual</h3><div class="what">“setting up your chat…” → “it's official 🎉” → one line each</div></div>
+      <p class="because"><b>Why:</b> connection happens between two people, not on a platform. Pay is settled up front, so the first call is about the work.<br><span class="chip">host, then step out</span></p></div>
+    <div class="card"><div><h3>Respond, react, or stay quiet</h3><div class="what">Wren speaks only when asked, or to lock a time</div></div>
+      <p class="because"><b>Why:</b> an agent that talks over people kills the moment. A good host knows when to leave.<br><span class="chip">host, then step out</span></p></div>
+    <div class="card"><div><h3>Private follow-up</h3><div class="what">“How did it go?” to each side; declines never forwarded</div></div>
+      <p class="because"><b>Why:</b> learning without shame. Each answer makes the next match better.<br><span class="chip">one great match</span></p></div>
+  </div>
+</section>
+
+<section class="slide">
+  <span class="kicker">Feature walkthrough · 4 of 4</span>
+  <h2>Tone and honesty</h2>
+  <div class="why">
+    <div class="card"><div><h3>Emotional intelligence</h3><div class="what">Feelings first; rewords questions that don't fit</div></div>
+      <p class="because"><b>Why:</b> job searching is vulnerable. After a layoff, “why would you leave?” hurts; “what would make a next role feel right?” helps.<br><span class="chip">trust travels through people</span></p></div>
+    <div class="card"><div><h3>A matchmaker-friend voice</h3><div class="what">Warm, specific, professional enough to forward</div></div>
+      <p class="because"><b>Why:</b> warmth is the product. People reply to friends, not to platforms.<br><span class="chip">trust travels through people</span></p></div>
+    <div class="card"><div><h3>A labeled fictional world</h3><div class="what">150 personas who answer in their own voice</div></div>
+      <p class="because"><b>Why:</b> an honest cold start. The full loop is demoable alone, without faking traction, and fake numbers are never texted.<br><span class="chip">consent before contact</span></p></div>
   </div>
 </section>
 
@@ -250,6 +371,38 @@ svg text { font-family: var(--f); }
   </div>
 </section>
 
+<!-- Anti-features -->
+<section class="slide">
+  <span class="kicker">Deliberately not building</span>
+  <h2>What we left out, and why</h2>
+  <div class="grid g3">
+    <div class="card"><h3>No feed or search</h3><p>Browsing turns people into inventory</p></div>
+    <div class="card"><h3>No apply button</h3><p>One-click apply is the void we're fixing</p></div>
+    <div class="card"><h3>No resume scoring</h3><p>Keyword matching is the problem</p></div>
+    <div class="card"><h3>No mass outreach</h3><p>Cold messages erode trust</p></div>
+    <div class="card"><h3>No pretending to be human</h3><p>Wren always says it's an AI</p></div>
+    <div class="card"><h3>No high-volume hiring</h3><p>A different product</p></div>
+  </div>
+  <p class="lede" style="max-width:none">Not yet: voice intake calls, calendar booking, placement fees.</p>
+</section>
+
+<!-- Built with AI -->
+<section class="slide">
+  <span class="kicker">Built with AI</span>
+  <h2>Prompting, pushing back, tools</h2>
+  <div class="grid g3">
+    <div class="card"><h3>Prompting approach</h3><ul class="short">
+      <li>Start from the brief</li><li>Real references: a Ditto chat, a friend's intro</li><li>Decisions written before UI</li>
+      <li>Voice + EQ guide as the system prompt</li><li>Structured outputs, rules fallback</li></ul></div>
+    <div class="card hot"><h3>Where I pushed back</h3><ul class="short">
+      <li>Web job board → iMessage agent</li><li>Shallow intake → anthropologist questions</li><li>Plain intro → Ditto + friend format</li>
+      <li>“Horrible personality” → grammar, EQ, Haiku</li><li>“Why leave?” after a layoff → reworded</li><li>Too many labels → trimmed</li></ul></div>
+    <div class="card"><h3>AI tools</h3><ul class="short">
+      <li>Claude Code: research, build, test, deploy</li><li>Claude Haiku 5.5 runs Wren</li><li>Live tests on my phone</li>
+      <li>Caught what tests missed: “I’m”, names, a privacy leak</li></ul></div>
+  </div>
+</section>
+
 <!-- 8. Changes -->
 <section class="slide">
   <span class="kicker">What we changed</span>
@@ -260,6 +413,18 @@ svg text { font-family: var(--f); }
     <div class="card"><h3>From review</h3><ul class="short">
       <li>Candidate name hidden till yes</li><li>Stricter matching</li><li>Fictional people never texted</li>
       <li>Employer path + resume step</li><li>Ditto-style group intro</li><li>Web prototype → iMessage agent</li></ul></div>
+  </div>
+</section>
+
+<!-- What's next -->
+<section class="slide">
+  <span class="kicker">What's next</span>
+  <h2>From proof of concept to real intros</h2>
+  <div class="grid g2">
+    <div class="card"><h3>Product</h3><ul class="short">
+      <li>Voice intake calls for niche roles</li><li>Calendar booking in the group chat</li><li>Vouches confirmed by the voucher</li><li>Headshots, resumes, JDs for the demo cast</li></ul></div>
+    <div class="card"><h3>Proof</h3><ul class="short">
+      <li>Seed with my own network first</li><li>Measure: both-yes rate, calls held, offers</li><li>Business line for real group chats</li><li>Postgres + Render for always-on</li></ul></div>
   </div>
 </section>
 
