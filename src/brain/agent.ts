@@ -43,6 +43,8 @@ export class Agent {
 
   // ------------------------------------------------------------------ inbound
   private async process(e: InboundEvent) {
+    // iPhones send smart punctuation ("I’m", “quotes”). Normalize once so every rule downstream sees plain ASCII.
+    e = { ...e, text: e.text.replace(/[‘’ʼ]/g, "'").replace(/[“”]/g, '"').replace(/…/g, "...") };
     const s = this.store;
     const chat = s.ensureChat(e.chatId, { handles: e.isGroup ? (e.participants ?? [e.from]) : [e.from], isGroup: e.isGroup });
     if (e.isGroup && !chat.handles.includes(e.from)) chat.handles.push(e.from);

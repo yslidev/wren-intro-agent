@@ -69,6 +69,7 @@ A running list for the work-trial presentation. Newest changes at the top of eac
 
 ## Changes we made (and why)
 
+- **Smart punctuation from iPhones is understood (live bug).** The first real test on the live line read "I’m Yushan" as the name "I’m", because iPhones send curly apostrophes. Every incoming text is now normalized to plain punctuation, and a test covers it.
 - **The candidate's name is hidden until they say yes (privacy fix).** When the hiring side went first, Wren was sending the candidate's name before the candidate agreed. The hiring side now sees the work, and gets the name only after the yes.
 - **The group intro is redesigned around the moment of connection.** It moved from three plain lines to the Ditto ritual combined with the shape of a real friend intro.
 - **The interview grew from 3 to 4 questions,** adding "what makes you lose track of time / what drains you" (the good-at versus good-for signal). Questions were rewritten as story prompts.

@@ -132,3 +132,11 @@ test("employer-first pitches keep the candidate anonymous until they opt in", ()
   const before = (yes < 0 ? toHR : toHR.slice(0, yes)).map((s) => s.text).join("\n");
   assert.ok(!before.includes(c.first), `candidate name leaked before their yes:\n${before}`);
 });
+
+test("iPhone smart punctuation is understood (I’m, don’t)", async () => {
+  const P = "+13415550133";
+  const t = (text: string) => agent.handle({ chatId: `real:${P}`, isGroup: false, from: P, text, messageId: crypto.randomUUID() });
+  await t("hey");
+  await t("I’m Yushan");
+  assert.equal(store.byHandle(P)!.first, "Yushan");
+});
