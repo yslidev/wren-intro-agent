@@ -139,3 +139,12 @@ Founder-side onboarding over text, real calendar booking, a database, per-intro 
 
 ## License
 MIT
+
+## Work-trial decisions (summary)
+The live demo's **Decisions** section has the full version.
+- **Wedge:** niche, expensive-to-fill roles at seed to Series B companies (founding engineers, first PMs, ML and evals, AI safety, specialist GTM). Agencies charge 20–25% for these hires, and founders already make them through friends.
+- **Unit of signal:** a vouch plus an anthropologist-style intake ([docs/intake.md](docs/intake.md)), turned into a blurb the candidate approves and a role card the hiring side approves. Resumes and JDs are read as input, not treated as the signal.
+- **Who initiates:** Wren, and either side can start. Double opt-in, asked privately. Candidates stay anonymous to the hiring side until they say yes.
+- **Transparency:** pay band and setup are settled in the first message of the intro, both sides come with vouches, and declines are never forwarded.
+- **Cold start:** the operator's own trusted network, with each match bringing a new vouch. The demo world is fictional and labeled, and a persona engine plays the other side.
+- **Not building:** a job board, search, feeds, an apply button, resume scoring, mass outreach, ATS integrations, or high-volume big-company hiring.

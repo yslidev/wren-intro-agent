@@ -21,6 +21,18 @@ export function family(title = ""): Family | undefined {
   return FAMILIES.find(([, re]) => re.test(title))?.[0];
 }
 
+/** Employer-initiated: the same rules, run from the role's side. Candidates still in intake are skipped. */
+export function rankCandidates(f: Person, people: Person[], intros: Intro[]): { candidate: Person; score: number; reasons: string[] }[] {
+  const already = new Set(intros.filter((i) => i.founderId === f.id).map((i) => i.candidateId));
+  const out: { candidate: Person; score: number; reasons: string[] }[] = [];
+  for (const c of people) {
+    if (c.role !== "candidate" || c.stage !== "ready" || already.has(c.id) || c.optedOut) continue;
+    const r = rankFounders(c, [f], [])[0];
+    if (r) out.push({ candidate: c, score: r.score, reasons: r.reasons });
+  }
+  return out.sort((a, b) => b.score - a.score);
+}
+
 /**
  * Hard filters first (role family, pay, setup, real skill overlap), then a small score. Deliberately simple and
  * explainable: every point has a sentence attached, and those sentences become Wren's "why you two".

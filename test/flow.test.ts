@@ -41,6 +41,8 @@ test("full double opt-in intro ends in a group chat, a booked time and follow-up
   assert.match(lastFromWren(`dm:${ALEX}`), /proudest/);
 
   await send(ALEX, "Rebuilt dispute handling for 2,000 merchants at Corvid. Cut resolution time from 9 days to 2.");
+  assert.match(lastFromWren(`dm:${ALEX}`), /lose track of time/);
+  await send(ALEX, "Messy ops problems with real customers. Drained by status meetings.");
   assert.match(lastFromWren(`dm:${ALEX}`), /leave/);
   await send(ALEX, "Smaller team, more ownership. I want to own a whole problem, not a slice.");
   await send(ALEX, "$180k base, remote or hybrid in SF");
@@ -65,7 +67,9 @@ test("full double opt-in intro ends in a group chat, a booked time and follow-up
   const group = store.chat(intro.chatId!)!;
   assert.ok(group.isGroup);
   assert.deepEqual(group.handles.sort(), [ALEX, SAM].sort());
-  assert.match(group.messages[0].text, /^Sam, meet Alex/);
+  assert.equal(group.messages[0].text, "setting up your chat...");
+  assert.ok(group.messages.some((m) => /^Alex x Sam, it's official/.test(m.text)), "Ditto-style invitation card");
+  assert.match(group.displayName ?? "", /Alex & Sam/);
 
   // Humans talking to each other: Wren stays quiet.
   const before = group.messages.length;

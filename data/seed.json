@@ -8,14 +8,14 @@
     },
     {
       "id": "c_priya", "handle": "+15550100102", "name": "Priya Raman", "first": "Priya", "role": "candidate", "stage": "ready",
-      "vouch": { "name": "Dev Patel", "relation": "Priya's cofounder at their last startup", "quote": "she shipped our eval harness in a weekend and it held up for two years" },
+      "vouch": { "name": "Dev Patel", "relation": "Priya's cofounder at their last startup", "quote": "the engineer who shipped our eval harness in a weekend, and it held up for two years" },
       "candidate": { "title": "ML engineer, ex-founding engineer", "years": 4, "skills": ["ml", "llm", "evals", "python", "infra"], "floorK": 190, "setups": ["remote", "hybrid"], "stages": ["seed", "series a"],
         "proudest": "Built the eval harness and fine-tuning pipeline at her last startup.", "whyLeave": "Wants to be early again, on a team that ships models to users." },
       "blurb": "Priya Raman, ML engineer (4 yrs). Built the eval harness and fine-tuning pipeline at her last startup; her cofounder Dev Patel says she shipped it in a weekend and it held up for two years. Wants to be early again on a team shipping models to users."
     },
     {
       "id": "c_jordan", "handle": "+15550100103", "name": "Jordan Lee", "first": "Jordan", "role": "candidate", "stage": "ready",
-      "vouch": { "name": "Tess Alvarez", "relation": "worked with Jordan at Fennel for 3 years", "quote": "turns a vague founder idea into a clickable prototype by Friday" },
+      "vouch": { "name": "Tess Alvarez", "relation": "worked with Jordan at Fennel for 3 years", "quote": "the designer who turns a vague founder idea into a clickable prototype by Friday" },
       "candidate": { "title": "Founding product designer", "years": 7, "skills": ["design", "brand", "consumer", "prototyping"], "floorK": 170, "setups": ["onsite", "hybrid"], "stages": ["seed", "series a"] },
       "blurb": "Jordan Lee, founding product designer (7 yrs). Tess Alvarez, who worked with Jordan for 3 years, says Jordan turns a vague founder idea into a clickable prototype by Friday."
     },

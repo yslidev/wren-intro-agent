@@ -54,10 +54,16 @@ test("a stranger texts in, gets onboarded, and a persona recruiter answers on it
   await send("Yo");
   assert.match(lastToMe(), /What should I call you|what's your name/i);
   await send("it's Yushan");
-  assert.match(lastToMe(), /Yushan/);
+  assert.match(lastToMe(), /hiring/);
+  await send("open to something new");
+  assert.match(lastToMe(), /Who (sent|pointed)/);
   await send("Maya Chen");
+  assert.match(lastToMe(), /resume/i);
+  await send("Senior Product Manager at Corvid, 6 years. Led merchant onboarding and payments risk. B2B SaaS.");
   assert.match(lastToMe(), /proudest/);
+  assert.equal(store.byHandle(ME)!.candidate!.years, 6);
   await send("Rebuilt merchant onboarding and payments risk checks, cut activation time from 6 days to 1");
+  await send("Untangling messy workflows with customers on the phone. Drained by politics.");
   await send("Smaller team, more ownership, closer to customers");
   await send("$175k, remote or hybrid");
   assert.match(lastToMe(), /Anything you'd change\?/);
@@ -83,4 +89,46 @@ test("a stranger texts in, gets onboarded, and a persona recruiter answers on it
   assert.ok(!net.sent.some((s) => s.to.split(",").some((h) => fictional.has(h))), "never texts a fictional number over the network");
   const personaChat = store.chat(`persona:${founder.handle}`);
   assert.ok(personaChat && personaChat.messages.some((m) => m.from === founder.handle), "persona texted back in its own thread");
+});
+
+test("a hiring manager texts in with a JD, gets a role card, and Wren finds and pitches a candidate", async () => {
+  const HR = "+13415550122";
+  const hr = (text: string) => agent.handle({ chatId: `real:${HR}`, isGroup: false, from: HR, text, messageId: crypto.randomUUID() });
+  const lastToHR = () => net.sent.filter((s) => s.to === HR).at(-1)?.text ?? "";
+  await hr("hi! a friend said you help with hiring?");
+  await hr("I'm Morgan, hiring for my startup");
+  assert.match(lastToHR(), /company/i);
+  await hr("Fieldstone Labs");
+  assert.match(lastToHR(), /JD/);
+  await hr("Founding ML Engineer. Applied AI startup building evals for agents. Python, LLMs, evals, infra. $190-230k + 1% equity, remote.");
+  assert.match(lastToHR(), /90 days/);
+  await hr("Our eval harness runs on every model release and catches regressions before customers do.");
+  await hr("Our last hire was a brilliant researcher who never shipped to production. We need someone who ships.");
+  await hr("Pitch: you own evals end to end. Catch: it's early, things break, some on-call.");
+  await hr("190-230k, 1% equity, remote");
+  assert.match(lastToHR(), /Anything you'd change\?/);
+  const f = store.byHandle(HR)!;
+  assert.equal(f.role, "founder");
+  assert.equal(f.founder!.roleTitle, "Founding ML Engineer");
+  assert.deepEqual(f.founder!.bandK, [190, 230]);
+  assert.ok(f.founder!.mustHaves.includes("evals"));
+
+  await hr("looks good");
+  await waitFor(() => /interested\?/.test(lastToHR()), "candidate pitch to the hiring manager");
+  const intro = store.intros.find((i) => i.founderId === f.id)!;
+  assert.equal(intro.initiatedBy, "founder");
+  await hr("yes please");
+  // The candidate is a persona: it answers on its own, then Wren makes the (demo) intro.
+  await waitFor(() => /it's official/.test(net.sent.filter((s) => s.to === HR).map((s) => s.text).join("\n")), "intro card sent to the hiring manager");
+  assert.equal(intro.status === "connected" || intro.status === "followed_up", true);
+});
+
+test("employer-first pitches keep the candidate anonymous until they opt in", () => {
+  const intro = store.intros.find((i) => i.initiatedBy === "founder")!;
+  const c = store.person(intro.candidateId)!;
+  const f = store.person(intro.founderId)!;
+  const toHR = net.sent.filter((s) => s.to === f.handle);
+  const yes = toHR.findIndex((s) => /said yes/.test(s.text));
+  const before = (yes < 0 ? toHR : toHR.slice(0, yes)).map((s) => s.text).join("\n");
+  assert.ok(!before.includes(c.first), `candidate name leaked before their yes:\n${before}`);
 });

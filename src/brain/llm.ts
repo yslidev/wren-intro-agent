@@ -145,7 +145,7 @@ export class Brain {
       z.object({
         toCandidate: z.array(z.string()).describe("2-4 texts to the candidate proposing the founder. End by asking if they want an intro."),
         toFounder: z.array(z.string()).describe("2-3 texts to the founder proposing the candidate (the candidate already said yes). Include the blurb. End by asking if they want the intro."),
-        groupIntro: z.array(z.string()).describe("3 texts for the new group chat: first introduces the candidate to the founder (no links), second the founder to the candidate, third states pay/setup already settled, offers the founder's open times, and says you'll step back."),
+        groupIntro: z.array(z.string()).describe("5 texts for the new group chat, no links: (1) exactly 'setting up your chat...'; (2) an invitation card: '<Candidate> x <Founder>, it's official 🎉' then lines starting 🗓 when (they pick here), 📍 where (25-min video call), 💸 already settled (band, equity, setup); (3) one warm line on who the hiring person is, with their vouch; (4) one warm line on the candidate's proof of work and vouch; (5) 'what day works best?' with the hiring side's open times, then say you'll step out."),
       }),
       "Write the texts for a double opt-in intro. Ground every claim in the context. Reasons are why this match is good; use the strongest one or two in plain language. Share the founder's band only in the group intro; never share the candidate's salary floor if hideComp is true.",
       JSON.stringify({ candidate: { name: c.name, blurb: c.blurb, vouch: c.vouch, hideComp: c.hideComp, ...c.candidate }, founder: { name: f.name, vouch: f.vouch, ...fp }, reasons }),
@@ -161,7 +161,8 @@ export class Brain {
     return {
       toCandidate: [
         say.proposeOpener(key, f.name),
-        `${fp.company} is ${an(stage)} ${fp.sector} company hiring ${an(fp.roleTitle)}. Their biggest problem right now: ${fp.problem}.${recruiter}`,
+        `${fp.company} is ${an([stage, fp.sector].filter(Boolean).join(" "))} company hiring ${an(fp.roleTitle)}. ${fp.success ? `What great looks like at 90 days: ${lowerFirst(sentence(fp.success))}` : `Their biggest problem right now: ${fp.problem}.`}${recruiter}`,
+        ...(fp.pitch ? [`${f.first}'s honest pitch and catch, in their words: "${fp.pitch.trim()}"`] : []),
         `Why you two: ${why}.${vouchLine}`,
         say.askIntro,
       ],
@@ -170,10 +171,13 @@ export class Brain {
         c.blurb ?? c.name,
         say.founderAsk(key, c.first),
       ],
+      // The moment of connection: Ditto's group-chat ritual + the shape of a friend's intro text.
       groupIntro: [
-        `${f.first}, meet ${c.first}. ${proofAndVouch(c).trim()}`.trim(),
-        `${c.first}, meet ${f.first}, ${who}${f.persona ? `, hiring ${an(fp.roleTitle)}` : ""}.`,
-        `Already settled: $${fp.bandK[0]}-${fp.bandK[1]}K plus ${fp.equity}, ${fp.setup}. ${f.first} has ${fp.slots.slice(0, 2).join(" or ")} open. I'll let you two take it from here.`,
+        say.settingUp,
+        `${c.first} x ${f.first}, it's official 🎉\n\n🗓 when: you two pick it in here\n📍 where: 25-min video call, I'll send the link\n💸 already settled: ${fp.bandK[0] ? `$${fp.bandK[0]}-${fp.bandK[1]}K` : "pay shared up front"}${fp.equity ? ` + ${fp.equity}` : ""}${fp.setup ? `, ${fp.setup}` : ""}`,
+        `${f.first} is ${f.persona ? `${f.persona.title} at ${fp.company}` : `building ${fp.company}`}, hiring ${an(fp.roleTitle)}.${f.vouch?.quote ? ` ${f.vouch.name} calls ${f.first} ${f.vouch.quote}.` : ""}`,
+        candidateLine(c),
+        `what day works best? ${f.first} has ${fp.slots.slice(0, 2).join(" or ")}. I'll step out once you two pick.`,
       ],
     };
   }
@@ -235,10 +239,22 @@ export class Brain {
 
 const sentence = (s: string) => (/[.!?]$/.test(s.trim()) ? s.trim() : `${s.trim()}.`);
 const lowerFirst = (s: string) => s.charAt(0).toLowerCase() + s.slice(1);
-const titleStage = (s: string) => (s === "seed" ? "seed-stage" : s.replace(/\b\w/g, (ch) => ch.toUpperCase()));
+const titleStage = (s: string) => (s === "seed" ? "seed-stage" : /^series/i.test(s) ? s.replace(/\b\w/g, (ch) => ch.toUpperCase()) : s);
 /** "a Founding Engineer", "an iOS Engineer", "an ML Engineer", "an AI company". */
 const an = (w: string) => `${/^([aeio]|u(?!s|n[ii]))|^(ml|llm|sre|mba|hr|seo)\b/i.test(w) ? "an" : "a"} ${w}`;
 const shortRelation = (r: string) => r.split(",")[0];
+
+/** "Alex recently rebuilt dispute handling ... Maya Chen calls Alex the best PM ..." for the group intro. */
+function candidateLine(p: Person): string {
+  const proud = p.candidate?.proudest?.trim();
+  const proof = proud
+    ? /^(i\s)?(shipped|built|rebuilt|led|launched|cut|grew|took|ran|designed|redesigned|found|closed|turned|wrote|created|scaled|migrated)\b/i.test(proud)
+      ? `${p.first} recently ${lowerFirst(sentence(proud.replace(/^i\s/i, "")))}`
+      : `${p.first}'s proudest work: ${lowerFirst(sentence(proud))}`
+    : `${p.first}: ${p.blurb ?? p.candidate?.title ?? ""}`;
+  const vouch = p.vouch?.quote ? ` ${p.vouch.name} calls ${p.first} ${p.vouch.quote}.` : "";
+  return (proof + vouch).trim();
+}
 
 /** " Proudest work: ... Maya Chen, Alex's manager at Corvid, calls Alex ..." */
 function proofAndVouch(p: Person): string {

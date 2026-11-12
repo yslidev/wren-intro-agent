@@ -15,6 +15,9 @@ export interface CandidateProfile {
   stages?: string[];
   proudest?: string;
   whyLeave?: string;
+  energy?: string;
+  /** Pasted resume or LinkedIn text (trimmed). The artifact, not the signal. */
+  resume?: string;
 }
 
 export interface FounderProfile {
@@ -28,6 +31,11 @@ export interface FounderProfile {
   mustHaves: string[];
   problem: string;
   slots: string[];
+  /** From the role intake: what success looks like at 90 days, what went wrong before, the honest pitch and catch. */
+  success?: string;
+  antiPattern?: string;
+  pitch?: string;
+  jd?: string;
 }
 
 export type Voice = "crisp" | "warm" | "hype" | "dry" | "lowercase" | "thoughtful";
@@ -43,7 +51,10 @@ export interface Persona {
 }
 
 /** Where a person is in their 1:1 thread with Wren. ("naming" = Wren asked a new contact for their name.) */
-export type Stage = "new" | "naming" | "interviewing" | "blurb_review" | "ready";
+export type Stage =
+  | "new" | "naming" | "side" | "resume" | "interviewing" | "blurb_review"   // candidate intake
+  | "company" | "jd" | "role_interview" | "role_review"                       // hiring intake
+  | "ready";
 
 export interface Person {
   id: string;
@@ -84,6 +95,8 @@ export interface Intro {
   status: IntroStatus;
   reasons: string[];
   score: number;
+  /** Who Wren asked first. Candidate-first by default; "founder" when a hiring manager asked Wren to find someone. */
+  initiatedBy?: "candidate" | "founder";
   chatId?: string;
   slot?: string;
   pitch?: { toCandidate: string[]; toFounder: string[]; groupIntro: string[] };

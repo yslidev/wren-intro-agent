@@ -160,12 +160,42 @@ main { display: grid; grid-template-columns: 290px minmax(0, 1fr) 330px; gap: 16
 .thought .v { overflow-wrap: anywhere; }
 .toggle { display: flex; align-items: center; gap: 6px; padding: 0 16px 8px; font-size: 12.5px; color: var(--muted); font-weight: 700; }
 .foot { color: var(--muted); font-size: 12.5px; font-weight: 600; text-align: center; }
+.foot a { color: var(--blue); }
+
+/* ---------- product nav + sections */
+.nav { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; font-weight: 800; font-size: 14px; }
+.nav a { color: var(--muted); text-decoration: none; padding: 6px 12px; border-radius: 999px; }
+.nav a:hover, .nav a.on { background: var(--surface); color: var(--ink); box-shadow: var(--shadow); }
+.nav .sp { flex: 1; }
+.nav .badge { font-size: 12px; color: var(--wren); background: var(--wren-bubble); padding: 4px 10px; border-radius: 999px; }
+.sect { display: grid; gap: 14px; padding-top: 18px; scroll-margin-top: 16px; }
+.sect h2 { font-size: 24px; font-weight: 800; margin: 0; letter-spacing: -0.02em; }
+.sect .lede { margin: 0; color: var(--muted); font-weight: 600; max-width: 72ch; }
+.how { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
+.dec { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+@media (max-width: 1000px) { .how, .dec { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 620px) { .how, .dec, .moment { grid-template-columns: minmax(0, 1fr) !important; } }
+.how-card, .dec-card, .side { background: var(--surface); border-radius: 20px; padding: 16px 18px; box-shadow: var(--shadow); display: grid; gap: 6px; align-content: start; }
+.how-card p, .dec-card p, .side p { margin: 0; color: var(--muted); font-size: 14px; }
+.how-card b, .side b { font-weight: 800; }
+.dec-card p b { color: var(--ink); }
+.num { width: 30px; height: 30px; border-radius: 50%; background: var(--sun); color: var(--sun-ink); display: grid; place-items: center; font-weight: 800; }
+.q { font-weight: 800; font-size: 15px; }
+.moment { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.side .k { font-size: 11.5px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; }
+.side.bad .k { color: var(--muted); }
+.side.good { outline: 2px solid var(--sun); }
+.side.good .k { color: var(--wren); }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <header class="brand">
+  <nav class="nav" aria-label="Sections">
+    <a href="#top" class="on">Live demo</a><a href="#how">How it works</a><a href="#decisions">Decisions</a>
+    <span class="sp"></span><span class="badge">Proof of concept · fictional data</span>
+  </nav>
+  <header class="brand" id="top">
     <svg viewBox="0 0 64 64" aria-hidden="true">
       <ellipse cx="32" cy="38" rx="21" ry="17" fill="#C88653"/>
       <ellipse cx="34" cy="43" rx="12" ry="9" fill="#F6E3CC"/>
@@ -184,8 +214,9 @@ main { display: grid; grid-template-columns: 290px minmax(0, 1fr) 330px; gap: 16
     <div class="actions">
       <span class="pill" id="transport"><span class="dot"></span><span></span></span>
       <span class="pill" id="llm"><span class="dot"></span><span></span></span>
-      <button class="btn play" id="demo" type="button" title="Alex gets interviewed, matched with a founder and introduced">▶ Play the demo</button>
+      <button class="btn play" id="demo" type="button" title="Alex gets interviewed, matched with a founder and introduced">▶ Candidate demo</button>
       <button class="btn" id="demo2" type="button" title="A stranger texts Wren cold and gets matched with a fictional recruiter who answers in her own voice">🎭 Recruiter demo</button>
+      <button class="btn" id="demo3" type="button" title="A hiring manager sends a JD; Wren interviews them, finds a candidate and asks them privately">🏢 Hiring demo</button>
       <button class="btn" id="reset" type="button">Reset</button>
     </div>
   </header>
@@ -213,7 +244,35 @@ main { display: grid; grid-template-columns: 290px minmax(0, 1fr) 330px; gap: 16
       <div class="thoughts" id="thoughts"></div>
     </section>
   </main>
-  <p class="foot">Everyone here is fictional. Phone numbers use the 555-01XX range reserved for fiction.</p>
+
+  <section class="sect" id="how" aria-labelledby="how-h">
+    <h2 id="how-h">How it works</h2>
+    <p class="lede">Wren works like a great boutique recruiter who happens to live in your texts. It reads what's written down, interviews like an anthropologist, and only makes an intro when both sides say yes.</p>
+    <div class="how">
+      <div class="how-card"><span class="num">1</span><b>Intake, both sides</b><p>Candidates paste a resume; hiring managers paste a JD. Then Wren asks for stories, not adjectives: the work you're proudest of, what drains you, what failed in this role before, the honest catch.</p></div>
+      <div class="how-card"><span class="num">2</span><b>One match, with reasons</b><p>Hard filters first (role family, pay floor, setup), then real skill overlap. Every point comes with a sentence, and those sentences become "why you two". One person at a time, never a stack.</p></div>
+      <div class="how-card"><span class="num">3</span><b>Double opt-in, privately</b><p>Either side can start. Wren asks the other side one-on-one, and nobody's name or details travel until they say yes. Declines stay private; Wren asks why so the next one is better.</p></div>
+      <div class="how-card"><span class="num">4</span><b>A group chat, then Wren steps out</b><p>"setting up your chat..." → an "it's official 🎉" card with pay already settled → one warm line about each person → "what day works best?" Wren stays quiet while they talk, locks the time, follows up after.</p></div>
+    </div>
+  </section>
+
+  <section class="sect" id="decisions" aria-labelledby="dec-h">
+    <h2 id="dec-h">Decisions</h2>
+    <p class="lede">The calls behind this proof of concept, and what we chose not to build.</p>
+    <div class="moment">
+      <div class="side bad"><span class="k">On LinkedIn</span><b>A cold InMail from a stranger</b><p>The candidate is one of hundreds of applicants, or a recruiter's 40th message that day. The first conversation is a screen. Pay comes up last. Nobody vouched for anyone.</p></div>
+      <div class="side good"><span class="k">With Wren</span><b>A group text from a friend who vetted you both</b><p>Both people already said yes. Each arrives with a vouch and one line of real work. Pay and setup are settled in the first message, so the first call is about the work. It feels like a friend's intro because it's built the same way.</p></div>
+    </div>
+    <div class="dec">
+      <div class="dec-card"><span class="q">Who's the wedge?</span><p><b>Niche, expensive-to-fill roles at seed to Series B companies:</b> founding engineers, first PMs, ML and evals, AI safety, specialist GTM. These are the hires agencies charge 20–25% for, and founders already make them through friends. Big-company, high-volume pipelines are a different product.</p></div>
+      <div class="dec-card"><span class="q">What replaces the resume?</span><p><b>A vouch plus a short intake conversation, distilled into a blurb the candidate approves.</b> The resume is still read, as input that saves questions, not as the signal. On the other side, the JD is input and the approved role card (90-day success, what failed before, honest pitch and catch) is the signal.</p></div>
+      <div class="dec-card"><span class="q">Who initiates?</span><p><b>Wren does, and either side can start it.</b> A candidate texts in, or a hiring manager sends a JD. Wren proposes one match at a time and asks each side privately. Mutual interest is required before anyone is introduced.</p></div>
+      <div class="dec-card"><span class="q">Transparency?</span><p><b>Pay band and setup up front</b>, stated in the intro card. Candidates are invisible until they say yes, and approve exactly what's said about them. Hiring contacts come with a vouch too (a reverse reference). Declines are never forwarded.</p></div>
+      <div class="dec-card"><span class="q">Cold start, without lying?</span><p><b>Start where trust already lives:</b> the operator's own network of people they'd personally intro, and every match brings a new vouch. In this demo everything is fictional and labeled; a persona engine plays the other side; the counts you see are real counts of the fake data.</p></div>
+      <div class="dec-card"><span class="q">Deliberately not building</span><p>A job board, search, feeds, an apply button, resume scoring, mass outreach, ATS integrations, or big-company volume hiring. <b>Not yet:</b> voice intake calls (Photon supports calls), calendar booking, placement fees.</p></div>
+    </div>
+  </section>
+  <p class="foot">Everyone here is fictional. Phone numbers use the 555-01XX range reserved for fiction. <a href="https://github.com/yslidev/wren-intro-agent">Source on GitHub</a></p>
 </div>
 
 <script>
@@ -256,7 +315,19 @@ const lastIntroFor = (p) => [...S.intros].reverse().find((i) => i.candidateId ==
 
 // ---------- intro tracker
 const STEPS = ["Vouch", "Interview", "Blurb OK", "Match", "They said yes", "Founder said yes", "Time booked", "Follow-up"];
+const HIRING_STEPS = ["JD", "Role intake", "Role card OK", "Match", "You said yes", "Candidate said yes", "Time booked", "Follow-up"];
+function hiringProgress(f) {
+  const i = [...S.intros].reverse().find((x) => x.founderId === f.id && x.initiatedBy === "founder");
+  let n = { company: 0, jd: 0, role_interview: 1, role_review: 2, ready: 3 }[f.stage] ?? 3;
+  if (i) n = Math.max(n, { asked_founder: 4, declined_founder: 4, asked_candidate: 5, declined_candidate: 5, connected: 6, scheduled: 7, followed_up: 8 }[i.status] ?? 4);
+  const c = i && person(i.candidateId);
+  const subs = ["Reading the JD.", "Wren is interviewing them about the role.", "Reviewing the role card.", "Role card approved. Wren is searching.",
+    `Wren found ${c?.first ?? "someone"}. Waiting on ${f.first}.`, `${f.first} said yes. Asking ${c?.first ?? "the candidate"} privately.`,
+    "Group chat is live. Wren is staying quiet.", `Booked ${i?.slot ?? ""}. Wren stepped out.`, "All done. Follow-ups sent to both sides."];
+  return { n, sub: subs[n] ?? "", steps: HIRING_STEPS };
+}
 function progress(c) {
+  if (c && c.role === "founder" && c.stage !== "ready" || c && c.role === "founder" && S.intros.some((x) => x.founderId === c.id && x.initiatedBy === "founder")) return hiringProgress(c);
   if (!c || c.role !== "candidate") return { n: 0, sub: "Pick a candidate to follow their intro." };
   const i = [...S.intros].reverse().find((x) => x.candidateId === c.id);
   // n = steps completed; step n is the one in progress.
@@ -282,10 +353,10 @@ function progress(c) {
 }
 function renderTrack() {
   const c = person(view[0].person);
-  const { n, sub } = progress(c);
-  $("track-title").textContent = c?.role === "candidate" ? `${c.first || "New contact"}'s intro` : "Intro progress";
+  const { n, sub, steps } = progress(c);
+  $("track-title").textContent = c ? `${c.first || "New contact"}'s ${c.role === "founder" ? "search" : "intro"}` : "Intro progress";
   $("track-sub").textContent = sub;
-  $("steps").innerHTML = STEPS.map((s, i) => `<div class="step ${i < n ? "done" : i === n ? "now" : ""}"><i></i>${s}</div>`).join("");
+  $("steps").innerHTML = (steps ?? STEPS).map((s, i) => `<div class="step ${i < n ? "done" : i === n ? "now" : ""}"><i></i>${s}</div>`).join("");
 }
 
 // ---------- cast
@@ -439,7 +510,7 @@ async function runDemo(btn, cid, interview, label, stranger) {
       await sleep(500);
     }
     if (!g) throw new Error("no group chat yet");
-    await until(() => countWren(g.id) >= 3);
+    await until(() => /what day works best/i.test(lastWren(g.id)));
     const [s1, s2] = f.slots ?? ["Thu 10:00 AM PT", "Thu 2:00 PM PT"];
     if (!f.simulated) await say(f.handle, `${byHandle(A).first}, great to meet you! ${s1.replace(/ PT$/, "")} or ${(s2 ?? s1).replace(/ PT$/, "")}?`, g.id);
     else await until(() => S.chats.find((c) => c.id === g.id)?.messages.some((m) => m.from === f.handle), 30000);
@@ -458,20 +529,79 @@ async function runDemo(btn, cid, interview, label, stranger) {
 $("demo").addEventListener("click", (e) => runDemo(e.currentTarget, "c_alex", {
   answers: [
     "Rebuilt dispute handling for 2,000 merchants at Corvid. Cut resolution time from 9 days to 2.",
+    "Messy ops problems with real customers on the other end. Status meetings drain me.",
     "Smaller team, more ownership. I want to own a whole problem, not a slice.",
     "$180k base, remote or hybrid in SF",
   ],
   approve: "Looks right, send it when it makes sense",
-}, "▶ Play the demo"));
+}, "▶ Candidate demo"));
 // A stranger texts Wren cold and ends up with Dee, a fictional Head of Talent who answers in her own (warm) voice.
 $("demo2").addEventListener("click", (e) => runDemo(e.currentTarget, null, {
   answers: [
     "Shipped one-tap checkout in our iOS app with fraud checks built in. Failed payments dropped 30% and the design team still uses my components.",
+    "Polishing the last 10% of an interaction until it feels obvious. Endless re-orgs drain me.",
     "Want to be early again at a small team that cares about craft.",
     "$160k, remote please",
   ],
   approve: "looks great!",
-}, "🎭 Recruiter demo", { handle: "+15550100150", lines: ["hey! a friend said you make intros?", "I'm Riley", "Tess Alvarez"] }));
+}, "🎭 Recruiter demo", { handle: "+15550100150", lines: [
+  "hey! a friend said you make intros?",
+  "I'm Riley",
+  "open to something new",
+  "Tess Alvarez",
+  "iOS Engineer, 5 years. Swift, payments and checkout flows, design systems. Previously at Kitebase and Saltmarsh.",
+] }));
+
+/**
+ * The employer side: a hiring manager texts in, pastes a JD, answers Wren's role intake, approves the role card,
+ * and Wren finds a candidate, asks them privately, then opens the group chat.
+ */
+async function runHiringDemo(btn) {
+  const label = btn.textContent;
+  btn.disabled = true; btn.textContent = "🐦 Playing…";
+  for (const b of document.querySelectorAll(".btn")) b.disabled = true;
+  try {
+    await post("/api/reset"); await load();
+    const H = "+15550100160", dmH = `dm:${H}`;
+    const lines = [
+      "hi! a friend said you help with hiring?",
+      "I'm Morgan, hiring for my startup",
+      "Fieldstone Labs",
+      "Founding ML Engineer. We're an applied AI startup building evals for agents. Python, LLMs, evals, infra. $190-230k + 1% equity, remote.",
+      "Our eval harness runs on every model release and catches regressions before customers do.",
+      "Our last hire was a brilliant researcher who never shipped to production. We need someone who ships.",
+      "Pitch: you own evals end to end, and the team actually listens. Catch: it's early, things break, some on-call.",
+      "190-230k, 1% equity, remote",
+    ];
+    for (const [k, line] of lines.entries()) {
+      await afterWren(dmH, () => say(H, line));
+      if (k === 0) { const m = await until(() => byHandle(H)); view[0] = { person: m.id, chat: null }; render(); }
+    }
+    await until(() => /change\?/i.test(lastWren(dmH)));
+    await afterWren(dmH, () => say(H, "looks good"));
+    await until(() => /interested\?/i.test(lastWren(dmH)), 90000);
+    let intro = [...S.intros].reverse().find((x) => x.founderId === byHandle(H).id);
+    const c = person(intro.candidateId);
+    view[1] = { person: c.id, chat: null }; render();
+    await say(H, "yes please");
+    if (!c.simulated) { await until(() => /intro\?/i.test(lastWren(`dm:${c.handle}`))); await say(c.handle, "Yes! That sounds exactly like what I want next."); }
+    const g = await until(() => S.chats.find((x) => x.isGroup && x.handles.includes(H)), 60000);
+    await until(() => /what day works best/i.test(lastWren(g.id)));
+    if (!c.simulated) await say(c.handle, `Hi Morgan! Excited to meet you.`, g.id);
+    else await until(() => S.chats.find((x) => x.id === g.id)?.messages.some((m) => m.from === c.handle), 30000);
+    await sleep(1200);
+    const slot = (byHandle(H).slots ?? ["Thu 10:00 AM PT"])[0].replace(/ PT$/, "");
+    await afterWren(g.id, () => say(H, `${slot} works for me. See you then!`, g.id));
+    await say(H, "@wren thank you!", g.id);
+    await until(() => /how did it go/i.test(lastWren(dmH)), 90000);
+    await say(H, "Great call. Moving them to a working session.");
+    if (!c.simulated) await say(c.handle, "Really good, excited for next steps.");
+    await sleep(3500); await load();
+  } catch (err) { console.error(err); btn.textContent = "Demo stopped: " + err.message; await sleep(2500); }
+  for (const b of document.querySelectorAll(".btn")) b.disabled = false;
+  btn.textContent = label;
+}
+$("demo3").addEventListener("click", (e) => runHiringDemo(e.currentTarget));
 
 load();
 let pending;

@@ -54,10 +54,60 @@ export const say = {
     "Perfect, {voucher} has good taste in people.",
   ], key), v),
 
-  // ---------------- interview (questions keep fixed wording)
-  q1: "Three quick questions, then I go quiet. First one: what's the work from the last couple of years you're proudest of?",
-  q2: "What would actually make you leave where you are now?",
-  q3: "Practical stuff, so I never waste your time: lowest base salary you'd take, and remote, hybrid or in office?",
+  // ---------------- which side are you on
+  askSide: (key: string, first: string) => fill(pick([
+    "Nice to meet you, {first}. Are you hiring, or open to something new?",
+    "Great to meet you, {first}! Quick one: are you hiring for a role, or exploring your next one?",
+  ], key), { first }),
+
+  // ---------------- candidate intake (the questions themselves live in intake.ts)
+  interviewIntro: (n: number) => `${["", "One", "Two", "Three", "Four", "Five"][n] ?? n} quick questions, then I go quiet.`,
+  resumeAsk: (key: string) => pick([
+    "Got a resume or LinkedIn summary? Paste it here and I'll read it so you don't have to repeat yourself. Or say skip and we'll just talk.",
+    "If you have a resume handy, paste it in. I'd rather read the facts than make you recite them. \"skip\" works too.",
+  ], key),
+  resumeRead: (key: string) => pick(["Read it. I won't make you repeat any of that.", "Got it, thank you. Now the stuff resumes never say."], key),
+  resumeSkipped: (key: string) => pick(["No problem, talking is better anyway.", "Totally fine. We'll do it the old-fashioned way."], key),
+
+  // ---------------- hiring-side intake
+  askCompany: (key: string, first: string) => fill(pick([
+    "Love it, {first}. I find people the way a well-connected friend would, and only intro them when both sides say yes. What's the company called?",
+    "Amazing. I'm basically a recruiter who only does warm intros. What's the company?",
+  ], key), { first }),
+  askJD: (key: string, company: string) => fill(pick([
+    "Paste the JD for the {company} role, or just tell me about it in a few lines. Messy is fine.",
+    "Send me the JD (or the messy version in your head). I'll read it before asking anything.",
+  ], key), { company }),
+  jdRead: (key: string, role: string) => fill(pick([
+    "Read it. {role}, got it. A few questions a JD never answers:",
+    "Thanks. Now the part that isn't in the JD. First:",
+  ], key), { role }),
+  ackRole: (key: string) => pick(["That's really useful.", "Noted, that changes who I'd look for.", "Love the honesty.", "Super helpful."], key),
+  roleCardIntro: (key: string) => pick([
+    "Here's how I'd describe the role to a candidate. Nothing goes out without your OK:",
+    "Draft of the role, the way I'd pitch it to someone great:",
+  ], key),
+  roleReady: (key: string) => pick([
+    "Perfect. I'll go find someone worth your time. I only reach out to people who'd actually want this.",
+    "On it. Give me a bit; I'll come back with one person, not a stack of resumes.",
+  ], key),
+  foundCandidate: (key: string) => pick([
+    "Okay, I think I found your person. Names come once they say yes, so here's the work first:",
+    "I found someone, and I think they're the real deal. They stay anonymous until they opt in, so here's what they've done:",
+  ], key),
+  askReachOut: "Want me to see if they're interested? You'll get their name the moment they say yes.",
+  checkingCandidate: (key: string) => pick([
+    "Great. I'll ask them privately. Nobody gets a cold message, and you'll only hear back if they're in.",
+    "On it. Asking them now. I only make the intro if they want it too.",
+  ], key),
+  candidatePassToFounder: (key: string, _first?: string) => pick([
+    "They're going to pass this time. I'll keep looking.",
+    "They aren't looking for this right now. Back to the search.",
+  ], key),
+  noCandidate: (key: string) => pick([
+    "Nobody I'd stake my reputation on yet. I'll keep looking and text you when there is.",
+    "Still searching. I'd rather send you one great person than five maybes.",
+  ], key),
 
   ack: (key: string) => pick(["Love that.", "Okay, that's a great answer.", "Noted, and honestly impressive."], key),
   ackReason: (key: string) => pick(["Makes total sense.", "Very fair. That's a good reason to move.", "Got it. That narrows things down nicely."], key),
@@ -125,6 +175,7 @@ export const say = {
   nudge: (first: string, founder: boolean) => founder ? `Want me to intro you to ${first}? Yes or no is fine.` : `Want me to intro you to ${first}? Yes or no is fine.`,
 
   // ---------------- group chat
+  settingUp: "setting up your chat...",
   locked: (key: string, slot: string) => fill(pick([
     "Locked in: {slot}. I'll send you both a short prep note the day before. Stepping out now. Have a great conversation.",
     "Locked in: {slot} ✨ Prep notes coming the day before. Stepping out now, the floor is yours.",
@@ -156,4 +207,6 @@ export const say = {
 };
 
 /** The personality section of Claude's system prompt. */
-export const VOICE_GUIDE = `Your personality: a matchmaker friend who knows too many founders. Warm, specific and a little playful, like a well-connected friend texting you, never like a recruiter or a bank. Confident about matches ("I think you two should meet"), humble about people. At most one light joke per moment, never at anyone's expense. Emoji are rare: only 🐦 (your signature) or ✨ when something good happens. No corporate words. Never fake urgency, never oversell a company.`;
+export const VOICE_GUIDE = `Your personality: a matchmaker friend who knows too many founders. Warm, specific and a little playful, like a well-connected friend texting you, never like a recruiter or a bank. Confident about matches ("I think you two should meet"), humble about people. At most one light joke per moment, never at anyone's expense. Emoji are rare: only 🐦 (your signature) or ✨ when something good happens; the "it's official" card in a new intro group may use 🎉 🗓 📍 💸 like an invitation. No corporate words. Never fake urgency, never oversell a company.
+
+How you interview (both sides): like an anthropologist, not a form. Read the resume or JD first so nobody repeats themselves. Ask for stories ("walk me through the last time..."), not adjectives. Ask about what failed and what drains them; that's where fit lives. Practical constraints last.`;
