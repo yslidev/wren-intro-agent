@@ -75,13 +75,13 @@ export class Brain {
     const out = await this.ask(
       "interview",
       z.object({
-        reply: z.string().describe("Your next text: a brief, specific reaction to the answer, then the next question verbatim if there is one."),
+        reply: z.string().describe("Your next text: a brief, specific reaction to the answer, then the next question if there is one, keeping its meaning but rewording it if their situation makes the default wording awkward."),
         floorK: z.number().nullable().describe("Lowest base salary in thousands of USD if stated, else null"),
         setups: z.array(z.enum(["remote", "hybrid", "onsite"])),
         stages: z.array(z.enum(["seed", "series a", "series b", "series c"])),
         skills: z.array(z.string()).describe("Lowercase skill tags clearly shown by the answer, e.g. payments, onboarding, growth, ml, design"),
       }),
-      "You are interviewing a candidate, like a friend would before introducing them. React to their answer in one short sentence that shows you listened (reference a detail), then ask the next question if one is given. Extract structured fields only when clearly stated.",
+      "You are interviewing a candidate, like a friend would before introducing them. React to their answer in one short sentence that shows you listened (reference a detail). If the answer carries a feeling (stress, a layoff, excitement), acknowledge it first, briefly and specifically. Then ask the next question if one is given. Keep its meaning, but reword it when their situation makes the default wording awkward; for example, if they were laid off, don't ask what would make them leave, ask what they want in their next place. Don't mention that you reworded anything. Extract structured fields only when clearly stated.",
       JSON.stringify({ candidate: { name: p.name, title: p.candidate?.title, vouch: p.vouch }, question, answer, nextQuestion: nextQuestion ?? null }),
       "low",
     );
