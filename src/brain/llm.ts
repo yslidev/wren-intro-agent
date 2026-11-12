@@ -2,16 +2,19 @@ import Anthropic from "@anthropic-ai/sdk";
 import { betaZodOutputFormat } from "@anthropic-ai/sdk/helpers/beta/zod";
 import { z } from "zod";
 import type { Person } from "../types.js";
-import { agreedSlot, extractFloorK, extractSetups, extractStages, intent, isSmallTalkAck, mentionsAgent, type Intent } from "./text.js";
+import { agreedSlot, extractFloorK, extractSetups, extractSkills, extractStages, intent, isSmallTalkAck, mentionsAgent, type Intent } from "./text.js";
+import { say, VOICE_GUIDE } from "./voice.js";
 
 /**
  * Wren's voice and rules. Kept byte-stable so it caches across every call.
  */
-const PERSONA = `You are Wren, an AI agent from Pathline that makes job introductions over iMessage the way a well-connected friend would. You text with candidates and with founders who are hiring.
+const PERSONA = `You are Wren, an AI agent from Pathline that makes job introductions over iMessage the way a well-connected friend would. You text with candidates and with founders and recruiters who are hiring.
+
+${VOICE_GUIDE}
 
 How you text:
 - Short. One to three sentences per message, like a real text from a friend. No bullet lists, no markdown, no headers.
-- Warm, direct and specific. Use first names. Mirror the other person's tone; no emoji unless they use them.
+- Use first names. Mirror the other person's energy.
 - You are an AI agent and you say so when asked. Never claim to be human.
 
 Rules you never break:
@@ -79,16 +82,17 @@ export class Brain {
     );
     if (out) return out;
     const floor = extractFloorK(answer), setups = extractSetups(answer);
-    const acks = ["Makes sense.", "Got it, thank you.", "Love that."];
+    const key = `${p.id}:${p.asked}`;
     const ack = !nextQuestion && (floor || setups.length)
       ? `Got it: ${[floor ? `$${floor}K floor` : "", setups.join(" or ")].filter(Boolean).join(", ")}.`
-      : /\d/.test(answer) && /from|to|cut|grew|%|x\b/i.test(answer) ? "That's a real result. Love it." : acks[p.asked % acks.length];
+      : /\d/.test(answer) && /from|to|cut|grew|%|x\b/i.test(answer) ? say.ackResult(key)
+      : p.asked === 2 ? say.ackReason(key) : say.ack(key);
     return {
       reply: nextQuestion ? `${ack} ${nextQuestion}` : ack,
       floorK: extractFloorK(answer) ?? null,
       setups: extractSetups(answer) as ("remote" | "hybrid" | "onsite")[],
       stages: extractStages(answer) as ("seed" | "series a" | "series b" | "series c")[],
-      skills: [] as string[],
+      skills: extractSkills(answer),
     };
   }
 
@@ -103,7 +107,8 @@ export class Brain {
     );
     if (out?.blurb) return out.blurb;
     const want = c.whyLeave ? ` What ${p.first} wants next, in their words: "${c.whyLeave.trim()}"` : "";
-    return `${p.name}, ${c.title || "operator"}${c.years ? `, ${c.years} years in` : ""}.${proofAndVouch(p)}${want}`.trim();
+    const title = c.title ? `, ${c.title}` : "";
+    return `${p.name || p.first}${title}${c.years ? `, ${c.years} years in` : ""}.${proofAndVouch(p)}${want}`.trim();
   }
 
   async reviseBlurb(p: Person, request: string): Promise<{ blurb: string; hideComp: boolean }> {
@@ -149,21 +154,25 @@ export class Brain {
     if (out && out.toCandidate.length && out.toFounder.length && out.groupIntro.length) return out;
     const why = reasons.slice(0, 2).join("; ");
     const stage = titleStage(fp.stage);
+    const key = `${c.id}:${f.id}`;
+    const recruiter = f.persona && f.persona.kind !== "founder" ? ` ${f.first} is running the search (${f.persona.title}).` : "";
+    const vouchLine = f.vouch ? ` And ${f.vouch.name} (${f.vouch.relation}) calls ${f.first} ${f.vouch.quote}.` : "";
+    const who = f.persona ? `${f.persona.title} at ${fp.company}` : `who's hiring ${an(fp.roleTitle)} at ${fp.company}`;
     return {
       toCandidate: [
-        `Okay, I think you should meet ${f.name}.`,
-        `${fp.company} is a ${stage} ${fp.sector} company hiring a ${fp.roleTitle}. Their biggest problem right now: ${fp.problem}.`,
-        `Why you two: ${why}.${f.vouch ? ` And ${f.vouch.name} (${f.vouch.relation}) says ${f.first} ${f.vouch.quote}.` : ""}`,
-        "Want an intro?",
+        say.proposeOpener(key, f.name),
+        `${fp.company} is ${an(stage)} ${fp.sector} company hiring ${an(fp.roleTitle)}. Their biggest problem right now: ${fp.problem}.${recruiter}`,
+        `Why you two: ${why}.${vouchLine}`,
+        say.askIntro,
       ],
       toFounder: [
-        `Hi ${f.first}, it's Wren. I think you should meet someone for your ${fp.roleTitle} role.`,
+        say.founderPitchOpener(key, { first: f.first, role: fp.roleTitle }),
         c.blurb ?? c.name,
-        `${c.first} already said yes and your band works for them. Want the intro? I'll start a group text.`,
+        say.founderAsk(key, c.first),
       ],
       groupIntro: [
         `${f.first}, meet ${c.first}. ${proofAndVouch(c).trim()}`.trim(),
-        `${c.first}, meet ${f.first}, who's hiring a ${fp.roleTitle} at ${fp.company}${f.vouch ? `. ${f.vouch.name} says ${f.first} ${f.vouch.quote}` : ""}.`,
+        `${c.first}, meet ${f.first}, ${who}${f.persona ? `, hiring ${an(fp.roleTitle)}` : ""}.`,
         `Already settled: $${fp.bandK[0]}-${fp.bandK[1]}K plus ${fp.equity}, ${fp.setup}. ${f.first} has ${fp.slots.slice(0, 2).join(" or ")} open. I'll let you two take it from here.`,
       ],
     };
@@ -209,7 +218,7 @@ export class Brain {
       JSON.stringify({ context, chat: transcript(history.slice(-15)) }),
       "low",
     );
-    return out?.reply ?? "Happy to help with logistics. Pick a time from the ones offered and I'll lock it in, then I'll get out of your way.";
+    return out?.reply ?? say.groupHelp;
   }
 
   async chat(p: Person, history: { who: string; text: string }[], status: string): Promise<string> {
@@ -226,7 +235,9 @@ export class Brain {
 
 const sentence = (s: string) => (/[.!?]$/.test(s.trim()) ? s.trim() : `${s.trim()}.`);
 const lowerFirst = (s: string) => s.charAt(0).toLowerCase() + s.slice(1);
-const titleStage = (s: string) => s.replace(/\b\w/g, (ch) => ch.toUpperCase());
+const titleStage = (s: string) => (s === "seed" ? "seed-stage" : s.replace(/\b\w/g, (ch) => ch.toUpperCase()));
+/** "a Founding Engineer", "an iOS Engineer", "an ML Engineer", "an AI company". */
+const an = (w: string) => `${/^([aeio]|u(?!s|n[ii]))|^(ml|llm|sre|mba|hr|seo)\b/i.test(w) ? "an" : "a"} ${w}`;
 const shortRelation = (r: string) => r.split(",")[0];
 
 /** " Proudest work: ... Maya Chen, Alex's manager at Corvid, calls Alex ..." */

@@ -3,16 +3,19 @@
  * Same Agent, Brain (rules mode), matching and SimTransport as the server; only the HTTP layer is replaced.
  */
 import seed from "../../data/seed.json" with { type: "json" };
+import world from "../../data/world.json" with { type: "json" };
 import { Agent } from "../brain/agent.js";
 import { Brain } from "../brain/llm.js";
 import { config } from "../config.js";
-import { Store, type Seed } from "../store.js";
+import { publicPerson, Store, type Seed } from "../store.js";
 import { SimTransport } from "../transports/sim.js";
 
-const store = new Store({ persist: false, seed: seed as unknown as Seed });
+// The hand-written demo cast plus the generated world (~150 fictional companies, recruiters and candidates).
+const cast = { people: [...seed.people, ...world.people] } as unknown as Seed;
+const store = new Store({ persist: false, seed: cast });
 const transport = new SimTransport(config.simAgentHandle);
 const brain = new Brain(false, config.model);
-const agent = new Agent(store, transport, brain, { matchDelayMs: 2500, followupDelayMs: 6000 });
+const agent = new Agent(store, transport, brain, { matchDelayMs: 2500, followupDelayMs: 6000, personaDelayMs: 2200 });
 
 const ok = { ok: true };
 
@@ -23,7 +26,7 @@ const ok = { ok: true };
       transport: "sim, running in your browser",
       llm: null,
       agentHandle: transport.agentHandle,
-      people: store.people.map(({ id, name, first, role, stage, handle, vouch, blurb }) => ({ id, name, first, role, stage, handle, vouch, blurb })),
+      people: store.people.map(publicPerson),
       intros: store.intros,
       chats: store.chats,
       log: store.log.slice(-200),

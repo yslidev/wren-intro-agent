@@ -27,7 +27,7 @@
     },
     {
       "id": "f_sam", "handle": "+15550100201", "name": "Sam Whitaker", "first": "Sam", "role": "founder", "stage": "ready",
-      "vouch": { "name": "Lena Park", "relation": "Sam's investor at Northbeam", "quote": "gives PMs a whole problem and gets out of the way" },
+      "vouch": { "name": "Lena Park", "relation": "Sam's investor at Northbeam", "quote": "the founder who gives PMs a whole problem and gets out of the way" },
       "founder": { "company": "Marigold", "stage": "series a", "sector": "consumer fintech", "roleTitle": "Senior PM, Growth (first PM hire)", "bandK": [180, 200], "equity": "0.25-0.40%", "setup": "remote",
         "mustHaves": ["growth", "onboarding", "fintech", "payments"], "problem": "only 38% of people who sign up ever fund their account", "slots": ["Thu 10:00 AM PT", "Thu 2:00 PM PT", "Fri 11:00 AM PT"] }
     },
@@ -39,13 +39,13 @@
     },
     {
       "id": "f_ravi", "handle": "+15550100203", "name": "Ravi Shah", "first": "Ravi", "role": "founder", "stage": "ready",
-      "vouch": { "name": "Dev Patel", "relation": "fellow founder in the same batch", "quote": "ships every week and tells you exactly where you stand" },
+      "vouch": { "name": "Dev Patel", "relation": "fellow founder in the same batch", "quote": "a founder who ships every week and tells you exactly where you stand" },
       "founder": { "company": "Loomwork", "stage": "seed", "sector": "AI workflow automation", "roleTitle": "Founding ML Engineer", "bandK": [180, 220], "equity": "0.8-1.5%", "setup": "hybrid",
         "mustHaves": ["ml", "llm", "evals", "infra"], "problem": "their agent works in demos but nobody can tell when it silently gets worse", "slots": ["Wed 11:00 AM PT", "Thu 4:00 PM PT"] }
     },
     {
       "id": "f_mei", "handle": "+15550100204", "name": "Mei Tan", "first": "Mei", "role": "founder", "stage": "ready",
-      "vouch": { "name": "Tess Alvarez", "relation": "Mei's former design lead", "quote": "has taste and listens to designers" },
+      "vouch": { "name": "Tess Alvarez", "relation": "Mei's former design lead", "quote": "a founder with taste who actually listens to designers" },
       "founder": { "company": "Kiln", "stage": "seed", "sector": "consumer social", "roleTitle": "Founding Designer", "bandK": [160, 185], "equity": "0.5-1.0%", "setup": "onsite",
         "mustHaves": ["design", "consumer", "prototyping", "brand"], "problem": "the app works but nobody remembers it", "slots": ["Tue 1:00 PM PT", "Wed 3:00 PM PT"] }
     }

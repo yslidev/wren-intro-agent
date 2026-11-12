@@ -5,7 +5,7 @@ import { z } from "zod";
 import { Agent } from "./brain/agent.js";
 import { Brain } from "./brain/llm.js";
 import { config } from "./config.js";
-import { normalize, Store } from "./store.js";
+import { normalize, publicPerson, Store } from "./store.js";
 import type { FounderProfile, Person } from "./types.js";
 
 const NewPerson = z.object({
@@ -44,11 +44,11 @@ export function makeTransport(): Transport {
   return new SimTransport(config.simAgentHandle);
 }
 
-export function buildApp(opts: { transport?: Transport; persist?: boolean; llm?: boolean } = {}): Built {
-  const store = new Store({ persist: opts.persist ?? true });
+export function buildApp(opts: { transport?: Transport; persist?: boolean; llm?: boolean; world?: boolean } = {}): Built {
+  const store = new Store({ persist: opts.persist ?? true, world: opts.world ?? config.world });
   const transport = opts.transport ?? makeTransport();
   const brain = new Brain(opts.llm ?? config.llmEnabled, config.model, (m) => store.addLog("llm", m));
-  const agent = new Agent(store, transport, brain, { matchDelayMs: config.matchDelayMs, followupDelayMs: config.followupDelayMs });
+  const agent = new Agent(store, transport, brain, { matchDelayMs: config.matchDelayMs, followupDelayMs: config.followupDelayMs, personaDelayMs: config.personaDelayMs });
   const app = new Hono();
   const isSim = transport.name === "sim";
 
@@ -67,7 +67,7 @@ export function buildApp(opts: { transport?: Transport; persist?: boolean; llm?:
       transport: transport.name,
       llm: brain.enabled ? config.model : null,
       agentHandle: transport.agentHandle,
-      people: store.people.map(({ id, name, first, role, stage, handle, vouch, blurb }) => ({ id, name, first, role, stage, handle, vouch, blurb })),
+      people: store.people.map(publicPerson),
       intros: store.intros,
       chats: isSim ? store.chats : [],
       log: store.log.slice(-200),

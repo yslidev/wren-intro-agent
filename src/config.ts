@@ -1,7 +1,8 @@
 import { existsSync, readFileSync } from "node:fs";
 
 // Minimal .env loader so the repo runs with zero extra deps.
-if (existsSync(".env")) {
+// Tests never read local secrets.
+if (process.env.NODE_ENV !== "test" && existsSync(".env")) {
   for (const line of readFileSync(".env", "utf8").split("\n")) {
     const m = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*)\s*$/);
     if (m && process.env[m[1]] === undefined) process.env[m[1]] = m[2].replace(/^["']|["']$/g, "");
@@ -32,4 +33,8 @@ export const config = {
   matchDelayMs: Number(env("MATCH_DELAY_MS", "4000")),
   followupDelayMs: Number(env("FOLLOWUP_DELAY_MS", "15000")),
   dataDir: env("DATA_DIR", "data/runtime"),
+  /** Load data/world.json (~150 fictional companies, recruiters and candidates). On by default, off in tests. */
+  world: env("WORLD", process.env.NODE_ENV === "test" ? "off" : "on") === "on",
+  /** How long a simulated recruiter or founder "takes" to text back. */
+  personaDelayMs: Number(env("PERSONA_DELAY_MS", "6000")),
 };

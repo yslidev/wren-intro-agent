@@ -30,8 +30,20 @@ export interface FounderProfile {
   slots: string[];
 }
 
-/** Where a person is in their 1:1 thread with Wren. */
-export type Stage = "new" | "interviewing" | "blurb_review" | "ready";
+export type Voice = "crisp" | "warm" | "hype" | "dry" | "lowercase" | "thoughtful";
+
+/** How a simulated hiring contact texts back. */
+export interface Persona {
+  kind: "founder" | "recruiter" | "agency_recruiter";
+  title: string;
+  voice: Voice;
+  bio: string;
+  /** 0 = says yes to anything decent, 1 = only the strongest matches. */
+  pickiness: number;
+}
+
+/** Where a person is in their 1:1 thread with Wren. ("naming" = Wren asked a new contact for their name.) */
+export type Stage = "new" | "naming" | "interviewing" | "blurb_review" | "ready";
 
 export interface Person {
   id: string;
@@ -48,6 +60,11 @@ export interface Person {
   hideComp?: boolean;
   /** Texted STOP (or another carrier opt-out keyword). Wren sends nothing until they text again. */
   optedOut?: boolean;
+  /** Made up (seed or world data). Never texted over a real network; on real transports the persona engine plays them. */
+  fictional?: boolean;
+  /** Always played by the persona engine, even in the simulator (the generated world). */
+  simulated?: boolean;
+  persona?: Persona;
   notes: string[];
 }
 

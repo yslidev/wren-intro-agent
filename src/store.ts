@@ -13,12 +13,19 @@ interface State {
 }
 
 const SEED_PATH = "data/seed.json";
+const WORLD_PATH = "data/world.json";
 export interface Seed { people: Partial<Person>[] }
 
-function seedState(seed?: Seed): State {
+/** The hand-written demo cast, plus (when world is on) the generated synthetic world. */
+function loadSeedPeople(seed?: Seed, world = false): Person[] {
   const raw = seed ?? (JSON.parse(readFileSync(SEED_PATH, "utf8")) as Seed);
-  const people = structuredClone(raw.people).map((p) => ({ asked: 0, notes: [], ...p }) as Person);
-  return { people, intros: [], chats: [], log: [], seenEvents: [] };
+  const extra = world && existsSync(WORLD_PATH) ? (JSON.parse(readFileSync(WORLD_PATH, "utf8")) as Seed).people : [];
+  // Everyone in seed/world data is made up, whatever the file says.
+  return structuredClone([...raw.people, ...extra]).map((p) => ({ asked: 0, notes: [], ...p, fictional: true }) as Person);
+}
+
+function seedState(seed?: Seed, world = false): State {
+  return { people: loadSeedPeople(seed, world), intros: [], chats: [], log: [], seenEvents: [] };
 }
 
 /**
@@ -30,17 +37,26 @@ export class Store extends EventEmitter {
   private file: string;
   private persist: boolean;
   private seed?: Seed;
+  private world: boolean;
 
-  constructor(opts: { persist?: boolean; seed?: Seed } = {}) {
+  constructor(opts: { persist?: boolean; seed?: Seed; world?: boolean } = {}) {
     super();
     this.persist = opts.persist ?? true;
     this.seed = opts.seed;
+    this.world = opts.world ?? false;
     this.file = join(config.dataDir, "state.json");
-    this.s = this.persist && existsSync(this.file) ? JSON.parse(readFileSync(this.file, "utf8")) : seedState(this.seed);
+    if (this.persist && existsSync(this.file)) {
+      this.s = JSON.parse(readFileSync(this.file, "utf8"));
+      // Pick up seed/world people added since this state file was written, without touching existing ones.
+      const have = new Set(this.s.people.map((p) => p.id));
+      for (const p of loadSeedPeople(this.seed, this.world)) if (!have.has(p.id)) this.s.people.push(p);
+    } else {
+      this.s = seedState(this.seed, this.world);
+    }
   }
 
   reset() {
-    this.s = seedState(this.seed);
+    this.s = seedState(this.seed, this.world);
     this.save();
     this.emit("change", { type: "reset" });
   }
@@ -102,6 +118,13 @@ export class Store extends EventEmitter {
     if (process.env.NODE_ENV !== "test") console.log(`[${kind}] ${text}`);
   }
 }
+
+/** What the simulator UI needs about a person (no private notes). */
+export const publicPerson = (p: Person) => ({
+  id: p.id, name: p.name, first: p.first, role: p.role, stage: p.stage, handle: p.handle, vouch: p.vouch, blurb: p.blurb,
+  fictional: p.fictional, simulated: p.simulated, persona: p.persona,
+  company: p.founder?.company, roleTitle: p.founder?.roleTitle, slots: p.founder?.slots, title: p.candidate?.title,
+});
 
 export const normalize = (h: string) => {
   const t = h.trim();
