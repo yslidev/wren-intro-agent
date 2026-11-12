@@ -47,9 +47,18 @@ export class Store extends EventEmitter {
     this.file = join(config.dataDir, "state.json");
     if (this.persist && existsSync(this.file)) {
       this.s = JSON.parse(readFileSync(this.file, "utf8"));
-      // Pick up seed/world people added since this state file was written, without touching existing ones.
-      const have = new Set(this.s.people.map((p) => p.id));
-      for (const p of loadSeedPeople(this.seed, this.world)) if (!have.has(p.id)) this.s.people.push(p);
+      // Pick up seed/world people added since this state file was written, and re-mark every seeded
+      // person as fictional (older state files predate the flag; a missing flag would let Wren text a fake number).
+      const seeded = new Map(loadSeedPeople(this.seed, this.world).map((p) => [p.id, p]));
+      for (const p of this.s.people) {
+        const s = seeded.get(p.id);
+        if (!s) continue;
+        p.fictional = true;
+        p.simulated ??= s.simulated;
+        p.persona ??= s.persona;
+        seeded.delete(p.id);
+      }
+      for (const p of seeded.values()) this.s.people.push(p);
     } else {
       this.s = seedState(this.seed, this.world);
     }
